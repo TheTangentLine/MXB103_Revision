@@ -25,7 +25,7 @@ $$f[x_i]=y_i,\qquad \boxed{f[x_i,\dots,x_{i+k}]=\frac{f[x_{i+1},\dots,x_{i+k}]-f
 
 Then $a_k=f[x_0,x_1,\dots,x_k]$, so
 
-$$\boxed{P_n(x)=f[x_0]+f[x_0,x_1](x-x_0)+f[x_0,x_1,x_2](x-x_0)(x-x_1)+\cdots}$$
+$$\boxed{P_n(x)=f[x_0]+f[x_0,x_1]\,(x-x_0)+f[x_0,x_1,x_2]\,(x-x_0)(x-x_1)+\cdots}$$
 
 ## 3. The divided-difference table
 
@@ -101,6 +101,47 @@ f[x_0,x_1,x_2,x_3]&=\frac{f[x_1,x_2,x_3]-f[x_0,x_1,x_2]}{x_3-x_0}\\[4pt]
 $$
 
 Strategy: apply the definition once, then again to each piece, until only $f[x_i]=y_i$ remain. Write each level on its own line, because each line is a mark.
+
+---
+
+## Step-by-step: what each step is doing
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Column 0: write $f[x_i]=y_i$ | Zeroth divided differences are just the data |
+| 2 | Column 1: $f[x_i,x_{i+1}]=\dfrac{y_{i+1}-y_i}{x_{i+1}-x_i}$ | The **slope** between neighbouring points |
+| 3 | Column 2: (lower − upper of column 1) ÷ (last $x$ − first $x$ of the 3 points it spans) | The "slope of slopes", which measures curvature |
+| 4 | Continue until one entry remains | Each column has one fewer entry |
+| 5 | Read the **top diagonal** $f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],\dots$ | These are the coefficients $a_0,a_1,a_2,\dots$ |
+| 6 | $P_n=a_0+a_1(x-x_0)+a_2(x-x_0)(x-x_1)+\cdots$ | Each term vanishes at the earlier nodes, so it doesn't disturb the fit there |
+| 7 | **Adding a point:** add a row at the bottom and compute **one** new entry per column | The new top-diagonal entry is the only new coefficient |
+
+> **Denominator rule:** an entry built from $x_i,\dots,x_j$ divides by $x_j-x_i$ (last minus first of the **whole span**, not the neighbours).
+
+### Worked example A: $(0,1),(1,0),(3,4)$, then add $(4,2)$
+
+**Steps 1–4:**
+
+| $x_i$ | col 0 | col 1 | col 2 | col 3 (after adding $x=4$) |
+|---|---|---|---|---|
+| 0 | **1** | | | |
+| | | $\frac{0-1}{1-0}=$ **−1** | | |
+| 1 | 0 | | $\frac{2-(-1)}{3-0}=$ **1** | |
+| | | $\frac{4-0}{3-1}=2$ | | $\frac{-4/3-1}{4-0}=$ **−7/12** |
+| 3 | 4 | | $\frac{-2-2}{4-1}=-\frac43$ | |
+| | | $\frac{2-4}{4-3}=-2$ | | |
+| 4 | 2 | | | |
+
+- **Steps 5–6:** $P_2(x)=1-1(x-0)+1(x-0)(x-1)=x^2-2x+1=(x-1)^2$. Check: $P_2(3)=4$ ✓
+- **Step 7:** $P_3(x)=P_2(x)-\frac7{12}\,x(x-1)(x-3)$. Check: $P_3(4)=9-\frac7{12}(4)(3)(1)=9-7=2$ ✓
+- **Evaluate at $x=2$:** $P_2(2)=1$ and $P_3(2)=1-\frac7{12}(2)(1)(-1)=1+1.1667=\mathbf{2.1667}$
+
+### Worked example B: why the "outermost $x$" rule matters
+
+Nodes in the order $x_0=2$, $x_1=5$, $x_2=3$ (unsorted), with $y=(4,25,9)$ from $y=x^2$:
+- $f[2,5]=\frac{25-4}{5-2}=7$ and $f[5,3]=\frac{9-25}{3-5}=8$
+- $f[2,5,3]=\dfrac{8-7}{x_2-x_0}=\dfrac{1}{3-2}=\mathbf1$ ✓ (the leading coefficient of $x^2$)
+- If you wrongly divided by $5-2$ you'd get $\frac13$ ✗
 
 ---
 

@@ -119,6 +119,67 @@ then $g$ has a **unique** fixed point in $[a,b]$, and the iteration converges to
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Bisection
+
+| Step | What you do | Why |
+|---|---|---|
+| 0 | Rearrange to $f(x)=0$ and check that $f(a)$, $f(b)$ have opposite signs | IVT: a continuous function that changes sign must cross zero in between |
+| 1 | $p=\frac{a+b}{2}$ | Guess the middle of the bracket |
+| 2 | Compute the **sign** of $f(p)$ | Only the sign matters, not the size |
+| 3 | If $\text{sign}f(p)=\text{sign}f(a)$, set $a\leftarrow p$. Otherwise set $b\leftarrow p$ | Keep the half that still has the sign change, so the root stays trapped |
+| 4 | Record $p$ as the current approximation | "Approximation after $n$ iterations" means the $n$th midpoint |
+| 5 | Repeat until $b-a\le$ tolerance | The bracket halves every time; the error is at most $\frac{b-a}2$ |
+
+**What each table column means:**
+
+| iter | $a$ | $b$ | $p$ | $f(a)$ | $f(b)$ | $f(p)$ |
+|---|---|---|---|---|---|---|
+| step number | left end (sign of $f(a)$ never changes) | right end (sign of $f(b)$ never changes) | midpoint = current estimate | always the same sign | always the opposite sign | decides which end $p$ replaces |
+
+### Worked example A: $f=x^2-3$ on $[1,2]$ (finding $\sqrt3$), 4 iterations
+
+- **Step 0:** $f(1)=-2<0$ and $f(2)=1>0$, so there is a sign change ✓
+
+| iter | $a$ | $b$ | $p$ | $f(p)$ | sign same as | update |
+|---|---|---|---|---|---|---|
+| 1 | 1 | 2 | 1.5 | −0.75 | $f(a)$ (−) | $a=1.5$ |
+| 2 | 1.5 | 2 | 1.75 | +0.0625 | $f(b)$ (+) | $b=1.75$ |
+| 3 | 1.5 | 1.75 | 1.625 | −0.3594 | $f(a)$ | $a=1.625$ |
+| 4 | 1.625 | 1.75 | 1.6875 | −0.1523 | $f(a)$ | $a=1.6875$ |
+
+After 4 iterations $x\approx1.6875$, and the root is in $[1.6875,1.75]$. The true value is $\sqrt3=1.7321$, so after 4 steps we know it only to within $\frac{1}{2^4}=0.0625$.
+
+### Fixed point iteration
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Rearrange $f(x)=0$ into $x=g(x)$ | The root of $f$ is now the point where $y=g(x)$ meets $y=x$ |
+| 2 | (Ideally) check $g$ maps $[a,b]$ into itself and $\lvert g'\rvert\le k<1$ | $\lvert g'\rvert<1$ means $g$ pulls points closer together, so the errors shrink |
+| 3 | Choose $x_0$; compute $x_1=g(x_0)$, $x_2=g(x_1)$, … | Feed each output back in |
+| 4 | Stop when consecutive iterates agree to the required accuracy | Convergence |
+| 5 | If the iterates run away or become undefined, try a different $g$ | Same equation, different rearrangement |
+
+### Worked example B: $x=\cos x$ (i.e. $f=x-\cos x$), $x_0=0.5$
+
+- **Step 1:** $g(x)=\cos x$
+- **Step 2:** on $[0,1]$, $\cos x\in[0.54,1]\subset[0,1]$ ✓, and $|g'|=|\sin x|\le\sin1=0.84<1$ ✓, so convergence is guaranteed
+- **Step 3:**
+
+| $n$ | $x_n$ | $g(x_n)=\cos x_n$ |
+|---|---|---|
+| 0 | 0.5 | 0.87758 |
+| 1 | 0.87758 | 0.63901 |
+| 2 | 0.63901 | 0.80269 |
+| 3 | 0.80269 | 0.69478 |
+| 4 | 0.69478 | 0.76820 |
+| 5 | 0.76820 | 0.71917 |
+
+- **Step 4:** the iterates **zig-zag** inward towards $0.7391$ (since $g'<0$), but slowly, because $|g'(0.739)|\approx0.67$. Compare Newton in Week 9, which needs only 3 steps.
+
+---
+
 ## Traps
 
 - Bisection: compare signs with $f(a)$, not with zero. Keep the half **with the sign change**.

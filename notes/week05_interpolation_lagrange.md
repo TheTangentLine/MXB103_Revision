@@ -102,6 +102,49 @@ $$P_2(3)=-\tfrac13(1)+1(0.5)+\tfrac13(0.25)=0.25\qquad(\text{true }0.3333,\ \tex
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Building and using the Lagrange polynomial
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | List the nodes $x_i$ and compute $y_i=f(x_i)$ | These are the points the polynomial must pass through (the $y$ values earn a mark) |
+| 2 | For each $i$, write the numerator $\prod_{j\ne i}(x-x_j)$ | This makes $L_{n,i}$ **zero at every other node** |
+| 3 | Write the denominator: the same product with $x\to x_i$ | This makes $L_{n,i}(x_i)=1$ |
+| 4 | $P_n(x)=\sum L_{n,i}(x)\,y_i$ | At node $x_k$ only $L_{n,k}$ survives, so $P_n(x_k)=y_k$ ✓ |
+| 5 | To estimate $f(\bar x)$: evaluate each $L_{n,i}(\bar x)$ as a **number** first, then combine | It's much faster on a calculator than expanding the polynomial |
+| 6 | Check $\sum_i L_{n,i}(\bar x)=1$ | A free arithmetic check: the weights always sum to 1 |
+
+### Bounding the interpolation error
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | $R_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}\prod_{i=0}^n(x-x_i)$, $c\in[a,b]$ | The exact error formula, with $c$ unknown |
+| 2 | Find $f^{(n+1)}$ and its max absolute value on $[a,b]$ | Worst case over $c$ |
+| 3 | Evaluate $\lvert\prod(x-x_i)\rvert$ at the given $x$, or use its given max | How far $x$ is from all the nodes |
+| 4 | Multiply | The guaranteed bound |
+
+### Worked example A: $f=\sqrt x$, nodes $1,4,9$; estimate $\sqrt5$
+
+- **Step 1:** $y=(1,\ 2,\ 3)$
+- **Steps 2–3 (evaluated at $x=5$):**
+  - $L_{2,0}(5)=\dfrac{(5-4)(5-9)}{(1-4)(1-9)}=\dfrac{(1)(-4)}{(-3)(-8)}=-\dfrac16$
+  - $L_{2,1}(5)=\dfrac{(5-1)(5-9)}{(4-1)(4-9)}=\dfrac{(4)(-4)}{(3)(-5)}=\dfrac{16}{15}$
+  - $L_{2,2}(5)=\dfrac{(5-1)(5-4)}{(9-1)(9-4)}=\dfrac{(4)(1)}{(8)(5)}=\dfrac1{10}$
+- **Step 6 (check):** $-\frac16+\frac{16}{15}+\frac1{10}=1$ ✓
+- **Steps 4–5:** $P_2(5)=-\frac16(1)+\frac{16}{15}(2)+\frac1{10}(3)=-0.1667+2.1333+0.3=\mathbf{2.2667}$ (true $2.2361$, error $0.031$)
+- **Error bound:** $f'''=\frac38x^{-5/2}$, so the max on $[1,9]$ is $\frac38$ (at $c=1$). $|\prod|=|(4)(1)(-4)|=16$. Bound: $\dfrac{3/8}{6}\times16=\mathbf{1.0}$ ✓ (it holds, but loosely)
+
+### Worked example B: linear interpolation (2 nodes), $f=e^x$ at $0,1$; estimate $e^{0.5}$
+
+- $y=(1,\ e)$
+- $L_{1,0}(0.5)=\frac{0.5-1}{0-1}=0.5$ and $L_{1,1}(0.5)=\frac{0.5-0}{1-0}=0.5$
+- $P_1(0.5)=0.5(1)+0.5(2.71828)=\mathbf{1.8591}$. True $1.6487$, error $0.2104$.
+- **Bound:** $R_1=\frac{e^c}{2}(x-0)(x-1)$, so $|R_1(0.5)|\le\frac{e}{2}\,|0.5\times(-0.5)|=\mathbf{0.3398}$ ✓
+- **Lesson:** a straight line through 2 points is crude. More nodes give a better fit (inside the interval).
+
+---
+
 ## Traps
 
 - Don't confuse the **Lagrange remainder** (product of all $(x-x_i)$) with the **Taylor remainder** ($(x-x_0)^{n+1}$).

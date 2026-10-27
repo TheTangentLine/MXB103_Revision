@@ -113,6 +113,59 @@ $e^x = 1+x+\frac{x^2}{2!}+\cdots$ exactly, as an **infinite** sum. A computer mu
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Procedure A: removing catastrophic cancellation
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Find the subtraction $A-B$ | Cancellation only ever happens in a subtraction (or in adding numbers of opposite sign) |
+| 2 | Check whether $A\approx B$ in the stated case (e.g. "$x$ large", "$x\approx0$", "$b^2\gg4ac$") | It's only dangerous when the leading digits agree |
+| 3 | Pick an identity that removes the subtraction: conjugate, log rule or trig identity | You want an **equivalent** formula with no near-equal subtraction |
+| 4 | Simplify; the dangerous terms cancel **exactly** in the algebra | Exact algebraic cancellation is safe. Only rounded-number cancellation is dangerous |
+| 5 | Check the new form only **adds** same-sign quantities (or divides/multiplies) | That confirms the cancellation is gone |
+
+### Worked example A: why it matters (3-digit arithmetic, $x=1000$)
+
+Compute $\sqrt{x+1}-\sqrt x$ with $\sqrt{1001}=31.6386$ and $\sqrt{1000}=31.6228$, storing only 3 significant digits.
+- **Original:** $fl(31.6386)-fl(31.6228)=31.6-31.6=\mathbf{0}$. Relative error 100%: every correct digit cancelled.
+- **Steps 3–4 (conjugate):** $\sqrt{x+1}-\sqrt x=\dfrac{1}{\sqrt{x+1}+\sqrt x}$
+- **Rearranged:** $\dfrac{1}{31.6+31.6}=\dfrac1{63.2}=\mathbf{0.0158}$. True value $0.015807$, so it is correct to 3 digits.
+
+### Procedure B: the Taylor polynomial + error bound
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Differentiate $f$ up to order $n+1$ | You need $n$ derivatives for $P_n$, plus one more for the remainder |
+| 2 | Evaluate $f,f',\dots,f^{(n)}$ at $x_0$ | $P_n$ is built to **match** $f$ and its derivatives at $x_0$ |
+| 3 | Substitute into $\sum\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k$ | This gives the approximating polynomial |
+| 4 | Write $R_n=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1}$ and state where $c$ lies | This is the **exact** error, but $c$ is unknown |
+| 5 | Replace $\lvert f^{(n+1)}(c)\rvert$ by its **maximum** over the interval | Worst case over every possible $c$ |
+| 6 | Replace $\lvert x-x_0\rvert^{n+1}$ by its **maximum** over the interval | Worst case over every $x$ you care about |
+| 7 | Multiply: "absolute error $\le$ (number) for all $x$ in $[a,b]$" | A guaranteed upper bound |
+
+### Worked example B: $f(x)=e^{-x}$, degree 3, $x_0=0$, on $[0,1]$
+
+- **Step 1:** $f=e^{-x}$, $f'=-e^{-x}$, $f''=e^{-x}$, $f'''=-e^{-x}$, $f^{(4)}=e^{-x}$
+- **Step 2:** at $0$ the values are $1,-1,1,-1$
+- **Step 3:** $P_3(x)=1-x+\dfrac{x^2}{2}-\dfrac{x^3}{6}$
+- **Step 4:** $R_3(x)=\dfrac{e^{-c}}{4!}x^4$, with $c$ between $0$ and $x$
+- **Step 5:** for $c\in[0,1]$, $e^{-c}$ is largest at $c=0$, giving $1$
+- **Step 6:** $|x|^4\le1$ on $[0,1]$
+- **Step 7:** $|R_3|\le\dfrac{1}{24}=\mathbf{0.0417}$ for all $x\in[0,1]$. (Check: $P_3(1)=0.3333$ and $e^{-1}=0.3679$, error $0.035$ ✓)
+
+### Worked example C: $f(x)=\log x$, degree 2, $x_0=1$, on $[1,1.5]$
+
+- **Step 1:** $f'=\frac1x$, $f''=-\frac1{x^2}$, $f'''=\frac2{x^3}$
+- **Step 2:** $f(1)=0$, $f'(1)=1$, $f''(1)=-1$
+- **Step 3:** $P_2(x)=(x-1)-\dfrac{(x-1)^2}{2}$
+- **Step 4:** $R_2=\dfrac{2/c^3}{6}(x-1)^3=\dfrac{(x-1)^3}{3c^3}$, with $c\in[1,1.5]$
+- **Step 5:** $\frac1{c^3}\le1$ (largest at $c=1$)
+- **Step 6:** $|x-1|^3\le0.5^3=0.125$
+- **Step 7:** $|R_2|\le\frac13(0.125)=\mathbf{0.0417}$
+
+---
+
 ## Traps
 
 - **Radian mode!** $\cos(\pi/4)$, not $\cos(45)$.

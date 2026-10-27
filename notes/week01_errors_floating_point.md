@@ -138,6 +138,51 @@ e.g. in $F(10,2,-1,1)$: $fl(100)$ = **Inf** (overflow), $fl(0.04)$ = **0** (unde
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Procedure A: decimal → binary
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Split $x$ into its integer part and its fraction | They are converted by different rules |
+| 2 | Integer: divide by 2 repeatedly, recording remainders | Each remainder is the next binary digit, starting from the $2^0$ place |
+| 3 | Read the remainders **bottom-up** | The last remainder belongs to the highest power of 2 |
+| 4 | Fraction: multiply by 2 repeatedly, recording the integer part (0 or 1) | Doubling shifts the binary point right; the digit that crosses it is the next digit, starting from the $2^{-1}$ place |
+| 5 | Read the integer parts **top-down**; stop when the fraction is 0 | The first digit produced is the $2^{-1}$ digit |
+| 6 | Check by expanding powers of 2 | This catches slips and earns the working mark |
+
+### Procedure B: find $fl(x)$ in $F(\beta,k,m,M)$
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Write $x$ in base $\beta$ | The machine stores base-$\beta$ digits |
+| 2 | Normalise to $d_1.d_2d_3\ldots\times\beta^e$ with $d_1\neq0$ | This is the unique representation the system uses |
+| 3 | Check $m\le e\le M$ | $e>M$ overflows (→ Inf); $e<m$ underflows (→ 0) |
+| 4 | Round the significand to $k$ digits | Only $k$ digits can be stored, and rounding causes the error |
+| 5 | (Optional) relative error $\frac{\lvert x-fl(x)\rvert}{\lvert x\rvert}$ | It is always $\le u=\frac12\beta^{1-k}$ |
+
+### Worked example A: $fl(10.375)$ in $F(2,4,-3,3)$
+
+- **Step 1 (to binary):** $10=1010_2$. Fraction: $0.375\times2=0.75\to0$, $0.75\times2=1.5\to1$, $0.5\times2=1.0\to1$, giving $.011$. So $10.375=1010.011_2$.
+- **Step 2 (normalise):** move the point 3 places left: $1.010011_2\times2^3$.
+- **Step 3 (exponent check):** $e=3$, and $-3\le3\le3$ ✓, so there is no overflow.
+- **Step 4 (round to $k=4$ digits):** $1.010\,|\,011$. The first dropped digit is 0, so round down: $fl(x)=1.010_2\times2^3=1010_2=\mathbf{10}$.
+- **Step 5 (error):** relative error $=\frac{0.375}{10.375}=0.0361\le u=\frac12\cdot2^{-3}=0.0625$ ✓
+
+### Worked example B: overflow and underflow in $F(10,3,-2,2)$
+
+- $x=456.78$: normalise to $4.5678\times10^2$. $e=2\le M$ ✓. Round to 3 digits: $fl(x)=4.57\times10^2=\mathbf{457}$.
+- $x=0.0012345$: normalise to $1.2345\times10^{-3}$. $e=-3<m=-2$, so **underflow**: $fl(x)=0$.
+- $x=1234$: $1.234\times10^3$. $e=3>M=2$, so **overflow**: $fl(x)=$ Inf.
+
+### Worked example C: all three key numbers for $F(3,3,-2,2)$
+
+- **Smallest positive** (smallest significand $1.00_3$, smallest exponent): $S=1.00_3\times3^{-2}=\frac19=\mathbf{0.1111}$
+- **Largest** (every digit $\beta-1=2$, largest exponent): $L=2.22_3\times3^2=\left(2+\tfrac23+\tfrac29\right)\times9=\mathbf{26}$. Formula check: $(3-3^{-2})\cdot9=27-1=26$ ✓
+- **Unit roundoff:** $u=\frac12\cdot3^{1-3}=\frac1{18}=\mathbf{0.0556}$
+
+---
+
 ## Traps
 
 - $k$ counts **all** significand digits, including $d_1$. So $F(2,5,\dots)$ means $1.xxxx$ (four digits after the point).

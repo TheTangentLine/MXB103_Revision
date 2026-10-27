@@ -93,6 +93,54 @@ So in practice you often bracket with bisection first, then finish with Newton.
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Newton's method
+
+| Step | What you do | What it means |
+|---|---|---|
+| 0 | Write $f(x)$ and $f'(x)$ | You need the function and its slope |
+| 1 | Evaluate $f(x_n)$ | The height of the curve at the current guess: how far from zero we are |
+| 2 | Evaluate $f'(x_n)$ | The slope of the tangent: how quickly $f$ changes here |
+| 3 | Compute the correction $\delta=\dfrac{f(x_n)}{f'(x_n)}$ | Height ÷ slope = how far along the tangent to go to reach zero |
+| 4 | $x_{n+1}=x_n-\delta$ | Jump to where the tangent hits the $x$-axis |
+| 5 | Repeat; stop when $\lvert x_{n+1}-x_n\rvert\le$ tol | Near the root, $\delta$ shrinks quadratically |
+
+### Secant method
+
+| Step | What you do | What it means |
+|---|---|---|
+| 0 | Choose two starting points $x_0,x_1$ | A secant line needs two points |
+| 1 | Slope $m=\dfrac{f(x_n)-f(x_{n-1})}{x_n-x_{n-1}}$ | Rise over run between the last two guesses, standing in for $f'$ |
+| 2 | $x_{n+1}=x_n-\dfrac{f(x_n)}{m}$ | Exactly Newton's step, with $f'$ replaced by $m$ |
+| 3 | Shift: drop $x_{n-1}$, keep $x_n$ and $x_{n+1}$ | Always use the **two most recent** points |
+| 4 | Repeat | Only one new $f$-evaluation per step |
+
+### Worked example A: Newton for $x=\cos x$ ($f=x-\cos x$, $f'=1+\sin x$), $x_0=0.5$
+
+| $n$ | $x_n$ | Step 1: $f(x_n)$ | Step 2: $f'(x_n)$ | Step 3: $\delta$ | Step 4: $x_{n+1}$ |
+|---|---|---|---|---|---|
+| 0 | 0.5 | $0.5-0.87758=-0.37758$ | $1+0.47943=1.47943$ | $-0.25522$ | **0.75522** |
+| 1 | 0.75522 | $0.02710$ | $1.68545$ | $0.01608$ | **0.73914** |
+| 2 | 0.73914 | $0.0000946$ | $1.67365$ | $0.0000565$ | **0.739085** |
+
+The errors are $1.6\times10^{-2}$, then $5.7\times10^{-5}$, then $7\times10^{-10}$: the number of correct digits roughly **doubles** each step. Fixed point iteration on the same equation (Week 8) was still wrong in the 2nd decimal place after 6 steps.
+
+### Worked example B: Secant for the same equation, $x_0=0$, $x_1=1$
+
+$f(0)=-1$ and $f(1)=1-\cos1=0.45970$
+
+| $n$ | $x_{n-1}$ | $x_n$ | Step 1: slope $m$ | Step 2: $x_{n+1}=x_n-f(x_n)/m$ |
+|---|---|---|---|---|
+| 1 | 0 | 1 | $\frac{0.45970-(-1)}{1-0}=1.45970$ | $1-\frac{0.45970}{1.45970}=$ **0.68507** |
+| 2 | 1 | 0.68507 | $\frac{-0.08930-0.45970}{0.68507-1}=1.74325$ | $0.68507-\frac{-0.08930}{1.74325}=$ **0.73630** |
+| 3 | 0.68507 | 0.73630 | … | **0.73912** |
+| 4 | 0.73630 | 0.73912 | … | **0.739085** |
+
+It takes one more step than Newton (order 1.618 vs 2), but needs no derivative.
+
+---
+
 ## 6. MATLAB Newton bugs (2023 Q10, 2 errors, 4 marks)
 
 ```matlab

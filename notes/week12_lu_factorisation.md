@@ -95,6 +95,55 @@ With $\mathbf b=[6,25,7,29]^T$: forward substitution gives $\mathbf z=[6,7,2,18]
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Computing L and U
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Row 1 of $U$ = row 1 of $A$ | Row 1 of $L$ is $(1,0,0)$, so $a_{1j}=1\cdot u_{1j}$ |
+| 2 | Column 1 of $L$: $\ell_{i1}=a_{i1}/u_{11}$ | Row $i$ of $L$ times column 1 of $U$ gives $\ell_{i1}u_{11}=a_{i1}$ |
+| 3 | Row 2 of $U$: $u_{2j}=a_{2j}-\ell_{21}u_{1j}$ | From (row 2 of $L$)·(column $j$ of $U$) $=a_{2j}$, where everything except $u_{2j}$ is already known |
+| 4 | Column 2 of $L$: $\ell_{32}=(a_{32}-\ell_{31}u_{12})/u_{22}$ | From (row 3 of $L$)·(column 2 of $U$) $=a_{32}$ |
+| 5 | $u_{33}=a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}$ | From (row 3 of $L$)·(column 3 of $U$) $=a_{33}$ |
+| 6 | Check: multiply $LU$ (one row is enough) and compare with $A$ | Catches sign slips |
+
+> **The one idea behind every formula:** $a_{ij}=(\text{row } i\text{ of }L)\cdot(\text{column } j\text{ of }U)$. Exactly one entry in that dot product is unknown at each stage, so you solve for it. The order (row of $U$, column of $L$, …) guarantees that.
+
+### Solving with L and U
+
+| Step | What you do | Why |
+|---|---|---|
+| 7 | Forward substitution on $L\mathbf z=\mathbf b$ (top → bottom) | $L$ is lower triangular, so row 1 gives $z_1$ directly, then row 2 gives $z_2$, … |
+| 8 | Backward substitution on $U\mathbf x=\mathbf z$ (bottom → top) | $U$ is upper triangular, so the last row gives $x_n$ directly |
+| 9 | Check $A\mathbf x=\mathbf b$ | Quick insurance |
+
+### Worked example A: factorise once, solve for TWO right-hand sides
+
+$$A=\begin{bmatrix}4&3&-1\\-8&-4&5\\4&7&4\end{bmatrix}$$
+
+- **Step 1:** $u_{11}=4,\ u_{12}=3,\ u_{13}=-1$
+- **Step 2:** $\ell_{21}=\frac{-8}{4}=-2$ and $\ell_{31}=\frac44=1$
+- **Step 3:** $u_{22}=-4-(-2)(3)=2$ and $u_{23}=5-(-2)(-1)=3$
+- **Step 4:** $\ell_{32}=\frac{7-(1)(3)}{2}=2$
+- **Step 5:** $u_{33}=4-(1)(-1)-(2)(3)=-1$
+
+$$L=\begin{bmatrix}1&0&0\\-2&1&0\\1&2&1\end{bmatrix},\qquad U=\begin{bmatrix}4&3&-1\\0&2&3\\0&0&-1\end{bmatrix}$$
+
+- **Step 6 (check row 3):** $(1,2,1)\cdot$ columns of $U$ gives $(4,\ 3+4,\ -1+6-1)=(4,7,4)$ ✓
+
+**First right-hand side** $\mathbf b_1=[6,-7,15]^T$:
+- **Step 7:** $z_1=6$; $-2(6)+z_2=-7\Rightarrow z_2=5$; $6+2(5)+z_3=15\Rightarrow z_3=-1$
+- **Step 8:** $-x_3=-1\Rightarrow x_3=1$; $2x_2+3(1)=5\Rightarrow x_2=1$; $4x_1+3-1=6\Rightarrow x_1=1$, so $\mathbf x=[1,1,1]^T$
+
+**Second right-hand side** $\mathbf b_2=[9,-21,4]^T$. *No need to refactorise. Reuse $L$ and $U$:*
+- **Step 7:** $z_1=9$; $-18+z_2=-21\Rightarrow z_2=-3$; $9-6+z_3=4\Rightarrow z_3=1$
+- **Step 8:** $x_3=-1$; $2x_2-3=-3\Rightarrow x_2=0$; $4x_1+0+1=9\Rightarrow x_1=2$, so $\mathbf x=[2,0,-1]^T$
+
+That reuse is the whole reason to factorise.
+
+---
+
 ## 6. Pivoting (concept only)
 
 LU **divides by the pivots** $u_{jj}$. If a pivot is **zero**, the method breaks down. If it's **tiny**, everything gets scaled up and roundoff errors grow, so plain LU is **numerically unstable**. **Pivoting** (swapping rows so the pivot is as large as possible) fixes this. It isn't covered in detail in MXB103 (see MXB226).

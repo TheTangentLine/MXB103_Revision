@@ -89,6 +89,57 @@ Forward: $\mathbf z=[5,6,12]^T$. Backward with $L^T$: $x_3=4$, $x_2=9$, $x_1=-3$
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Showing positive definiteness
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | State the goal: $\mathbf x^TA\mathbf x>0$ for all $\mathbf x\ne\mathbf0$ | The definition, worth a mark |
+| 2 | Compute $A\mathbf x$, then $\mathbf x^T(A\mathbf x)$ | This gives a quadratic in $x_1,x_2,\dots$ |
+| 3 | Complete the square(s) | Rewrite it as a **sum of squares** with positive coefficients |
+| 4 | Argue it is $\ge0$, with equality only when all the squared terms are zero, which forces $\mathbf x=\mathbf0$ | Strict positivity for nonzero $\mathbf x$ |
+
+### Worked example A: a 3×3 case, $A=\begin{bmatrix}2&-1&0\\-1&2&-1\\0&-1&2\end{bmatrix}$
+
+- **Step 2:** $\mathbf x^TA\mathbf x=2x_1^2+2x_2^2+2x_3^2-2x_1x_2-2x_2x_3$
+- **Step 3:** split each $2x_i^2$ so the cross terms pair up:
+$$=x_1^2+\underbrace{(x_1^2-2x_1x_2+x_2^2)}_{(x_1-x_2)^2}+\underbrace{(x_2^2-2x_2x_3+x_3^2)}_{(x_2-x_3)^2}+x_3^2$$
+- **Step 4:** a sum of squares is $\ge0$. It is zero only if $x_1=0$, $x_1=x_2$, $x_2=x_3$ and $x_3=0$, i.e. $\mathbf x=\mathbf0$. So $A$ is PD ✓
+
+### Computing L (column by column)
+
+| Step | Entry | Formula | Where it comes from |
+|---|---|---|---|
+| 1 | $\ell_{11}$ | $\sqrt{a_{11}}$ | $a_{11}=\ell_{11}^2$ |
+| 2 | $\ell_{21},\ell_{31}$ | $a_{i1}/\ell_{11}$ | $a_{i1}=\ell_{i1}\ell_{11}$ |
+| 3 | $\ell_{22}$ | $\sqrt{a_{22}-\ell_{21}^2}$ | $a_{22}=\ell_{21}^2+\ell_{22}^2$ |
+| 4 | $\ell_{32}$ | $(a_{32}-\ell_{31}\ell_{21})/\ell_{22}$ | $a_{32}=\ell_{31}\ell_{21}+\ell_{32}\ell_{22}$ |
+| 5 | $\ell_{33}$ | $\sqrt{a_{33}-\ell_{31}^2-\ell_{32}^2}$ | $a_{33}=\ell_{31}^2+\ell_{32}^2+\ell_{33}^2$ |
+| 6 | solve | $L\mathbf z=\mathbf b$ (forward), then $L^T\mathbf x=\mathbf z$ (backward) | $A=LL^T$ |
+
+> If any square root has a **negative** argument (or zero), stop: $A$ is not positive definite.
+
+### Worked example B: $A=\begin{bmatrix}9&3&-3\\3&5&1\\-3&1&6\end{bmatrix}$, $\mathbf b=[0,0,8]^T$
+
+- **Step 1:** $\ell_{11}=\sqrt9=3$
+- **Step 2:** $\ell_{21}=\frac33=1$ and $\ell_{31}=\frac{-3}{3}=-1$
+- **Step 3:** $\ell_{22}=\sqrt{5-1^2}=2$
+- **Step 4:** $\ell_{32}=\frac{1-(-1)(1)}{2}=1$
+- **Step 5:** $\ell_{33}=\sqrt{6-(-1)^2-1^2}=2$
+
+$$L=\begin{bmatrix}3&0&0\\1&2&0\\-1&1&2\end{bmatrix}$$
+
+All the square roots worked, so $A$ is SPD.
+
+- **Step 6, forward** ($L\mathbf z=\mathbf b$): $3z_1=0\Rightarrow z_1=0$; $z_1+2z_2=0\Rightarrow z_2=0$; $-z_1+z_2+2z_3=8\Rightarrow z_3=4$
+- **Step 6, backward** ($L^T\mathbf x=\mathbf z$, with $L^T=\begin{bmatrix}3&1&-1\\0&2&1\\0&0&2\end{bmatrix}$): $2x_3=4\Rightarrow x_3=2$; $2x_2+2=0\Rightarrow x_2=-1$; $3x_1-1-2=0\Rightarrow x_1=1$
+
+$$\mathbf x=[1,-1,2]^T$$
+Check: row 1 of $A\mathbf x$ is $9-3-6=0$ ✓
+
+---
+
 ## 5. Why Cholesky? (comparison)
 
 | | LU (Doolittle) | Cholesky |

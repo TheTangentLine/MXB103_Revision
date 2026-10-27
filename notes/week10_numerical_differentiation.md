@@ -92,6 +92,51 @@ $f(0.1)=0.9139$, $f(0.2)=0.8515$, $f(0.3)=0.8075$
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Applying a formula to a table
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Find $h$, the spacing between the $x$-values you'll use | Every formula divides by $h$, $2h$ or $h^2$ |
+| 2 | Identify the point $x_0$ and which neighbours exist: left? right? both? | This decides the formula |
+| 3 | Choose: left end → forward; right end → backward; interior → central (2nd order, more accurate) | Use the most accurate formula the data allow |
+| 4 | Write the general formula **before** substituting | Worth 1 mark on its own |
+| 5 | Substitute the values and compute | The answer mark |
+
+### Worked example A: $f(x)=\sin x$, table at $x=0.9,\ 1.0,\ 1.1$: $0.7833,\ 0.8415,\ 0.8912$
+
+**Step 1:** $h=0.1$
+
+| Want | Step 2: neighbours | Step 3: formula | Step 5: value | Exact |
+|---|---|---|---|---|
+| $f'(1.0)$ using $f(1.0)$, $f(1.1)$ | right only | forward | $\frac{0.8912-0.8415}{0.1}=0.4970$ | 0.5403 (err 0.043) |
+| $f'(1.0)$ using $f(0.9)$, $f(1.0)$ | left only | backward | $\frac{0.8415-0.7833}{0.1}=0.5820$ | (err 0.042) |
+| $f'(1.0)$ using $f(0.9)$, $f(1.1)$ | both | central | $\frac{0.8912-0.7833}{0.2}=0.5395$ | (err **0.0008**) |
+| $f''(1.0)$ | both + centre | central $f''$ | $\frac{0.7833-2(0.8415)+0.8912}{0.01}=-0.850$ | −0.8415 |
+
+The forward and backward errors are about equal and opposite, so central (their average) cancels most of the error. That's exactly why it is second order.
+
+### Deriving any difference formula
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Write Taylor expansions of each $f(x_0\pm h)$ (or $f(x_0+2h)$, …) about $x_0$, with a remainder term | This expresses every table value in terms of $f(x_0),f'(x_0),f''(x_0),\dots$ |
+| 2 | Combine them (add, subtract or take multiples) to **kill** the unwanted derivatives | Keep only the derivative you want plus the error |
+| 3 | Rearrange for the wanted derivative | This gives formula + error term |
+| 4 | If two $c$'s appear, merge them with the IVT | You get a single $c$ in the final error term |
+
+### Worked example B: deriving the backward difference with its error
+
+- **Step 1:** replace $h$ by $-h$ in Taylor: $f(x_0-h)=f(x_0)-hf'(x_0)+\frac{h^2}{2}f''(c)$, with $c\in(x_0-h,x_0)$
+- **Step 2:** only one expansion, so there's nothing to cancel
+- **Step 3:** $hf'(x_0)=f(x_0)-f(x_0-h)+\frac{h^2}2f''(c)$, so $f'(x_0)=\dfrac{f(x_0)-f(x_0-h)}{h}+\dfrac h2f''(c)$
+- **Step 4:** not needed (only one $c$)
+
+The error is $O(h)$, so this is first order.
+
+---
+
 ## 4. Instability: choosing $h$ (2023 Q11b, 2 marks)
 
 Every formula **subtracts nearly-equal numbers** and **divides by a small number**, so it is **numerically unstable**.

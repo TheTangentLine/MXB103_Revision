@@ -73,6 +73,60 @@ $$
 
 ---
 
+## Step-by-step: what each step is doing
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | Check that the spacing is constant and find $h$ | This form only works for equal spacing |
+| 2 | Column $\Delta y$: subtract each $y$ from the one below | First differences (rise per step) |
+| 3 | Column $\Delta^2y$: subtract each $\Delta y$ from the one below | Change in the rise, i.e. curvature |
+| 4 | Continue until one number remains | $n+1$ points give differences up to $\Delta^n$ |
+| 5 | Read the **top diagonal** $y_0,\Delta y_0,\Delta^2y_0,\dots$ | These feed the formula |
+| 6 | Write $P_n=y_0+s\Delta y_0+\frac{s(s-1)}{2!}\Delta^2y_0+\frac{s(s-1)(s-2)}{3!}\Delta^3y_0+\cdots$ | It's just the divided-difference form with $h$ absorbed |
+| 7 | State $s=\frac{x-x_0}{h}$ | A separate mark, so don't forget it |
+| 8 | To evaluate: compute $s$ from $x$ **first**, then substitute | The polynomial is in $s$, not $x$ |
+
+> **Why no division?** Equal spacing makes every denominator a multiple of $h$, and those factors are collected into $k!\,h^k$ and absorbed by the $s$ substitution.
+
+### Worked example A: $e^x$ at $0,0.25,0.5,0.75$; estimate $e^{0.1}$
+
+**Step 1:** $h=0.25$
+
+**Steps 2–4:**
+
+| $x$ | $y$ | $\Delta y$ | $\Delta^2y$ | $\Delta^3y$ |
+|---|---|---|---|---|
+| 0 | **1.0000** | | | |
+| | | **0.2840** | | |
+| 0.25 | 1.2840 | | **0.0807** | |
+| | | 0.3647 | | **0.0229** |
+| 0.5 | 1.6487 | | 0.1036 | |
+| | | 0.4683 | | |
+| 0.75 | 2.1170 | | | |
+
+**Steps 5–7:**
+$$P_3=1+0.2840s+\frac{0.0807}{2}s(s-1)+\frac{0.0229}{6}s(s-1)(s-2),\qquad s=\frac{x}{0.25}=4x$$
+
+**Step 8:** $x=0.1$ gives $s=0.4$:
+- term 1: $1$
+- term 2: $0.2840(0.4)=0.11360$
+- term 3: $0.04035(0.4)(-0.6)=-0.00968$
+- term 4: $0.003817(0.4)(-0.6)(-1.6)=+0.00147$
+
+$$P_3=\mathbf{1.1054}\qquad(\text{true }e^{0.1}=1.1052)$$
+
+### Worked example B: $f=\frac1{x+1}$ at $1,1.5,2$; estimate $f(1.2)$
+
+- **Step 1:** $h=0.5$
+- **Steps 2–4:** $y=(0.5,\ 0.4,\ 0.3333)$, $\Delta y=(-0.1,\ -0.0667)$, $\Delta^2y=0.0333$
+- **Steps 5–7:** $P_2=0.5-0.1s+\frac{0.0333}{2}s(s-1)$, with $s=\frac{x-1}{0.5}=2(x-1)$
+- **Step 8:** $x=1.2$ gives $s=0.4$, so $P_2=0.5-0.04+0.01665(0.4)(-0.6)=0.5-0.04-0.0040=\mathbf{0.4560}$ (true $0.4545$)
+
+### Common slip: forgetting Step 8
+Plugging $x=1.2$ straight into the $s$-polynomial gives $0.5-0.12+0.01665(1.2)(0.2)=0.384$ ✗. That's a completely wrong answer.
+
+---
+
 ## 6. ⚠️ Interpolation vs extrapolation (lecture problem)
 
 Population: 1970: 1817, 1980: 2007, 1990: 2293, 2000: 2532, 2010: 2765. With $h=10$ and $s=(\text{year}-1970)/10$:

@@ -21,6 +21,7 @@
 | [week12_lu_factorisation.md](week12_lu_factorisation.md) | Triangular systems, LU factorisation | Exam Q15 |
 | [week13_cholesky.md](week13_cholesky.md) | SPD matrices, Cholesky factorisation | Exam Q16 |
 | [99_exam_playbook.md](99_exam_playbook.md) | Question-by-question exam map, **MATLAB bug catalogue**, derivations to memorise, **errors in the official solutions**, A4 sheet plan | The last 2–3 days |
+| [../practice_exams/](../practice_exams/) | **Two full practice exams** with mark-annotated solutions | After the 2023–2025 papers |
 
 Each week file follows the same layout:
 
@@ -29,8 +30,9 @@ Each week file follows the same layout:
 3. **Core formulas**: what goes on your A4 sheet
 4. **Derivations**: the exam always has 2–4 of these
 5. **Worked examples**, set out the way the markers want
-6. **Traps**: where marks are lost
-7. **Practice** with hidden answers (click ▶ to reveal)
+6. **Step-by-step walkthroughs**: each method as a numbered table (step / what you do / why), followed by extra examples where every line is labelled with its step
+7. **Traps**: where marks are lost
+8. **Practice** with hidden answers (click ▶ to reveal)
 
 ## Viewing the diagrams
 

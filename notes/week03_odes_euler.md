@@ -118,6 +118,53 @@ end
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Euler's method: one step, broken down
+
+| Step | What you do | What it means |
+|---|---|---|
+| 0 | Read off $f(t,y)$, $a$, $\alpha$, $h$ (or $n=\frac{b-a}{h}$) | **Setup**, worth a mark on its own. Write it down |
+| 1 | $t_0=a$, $w_0=\alpha$ | Your starting position on the curve is known exactly |
+| 2 | Compute the slope $f(t_i,w_i)$ | The ODE tells you which way the curve heads **at this point** |
+| 3 | Multiply by $h$: $hf(t_i,w_i)$ | Rise = slope × run. This is how much $y$ changes over the step if the slope stayed constant |
+| 4 | $w_{i+1}=w_i+hf(t_i,w_i)$ | The new height |
+| 5 | $t_{i+1}=t_i+h$ | Move forward in time |
+| 6 | Repeat from Step 2 using the **new** $(t_{i+1},w_{i+1})$ | Each step starts from the previous approximation, which is how errors accumulate |
+
+### Worked example A: $y'=-2ty$, $y(0)=1$, $h=0.25$, two steps (exact $y=e^{-t^2}$)
+
+- **Step 0:** $f(t,y)=-2ty$, $a=0$, $\alpha=1$, $h=0.25$
+- **Step 1:** $t_0=0$, $w_0=1$
+- **Steps 2–4 ($i=0$):** slope $f(0,1)=-2(0)(1)=0$, increment $0.25\times0=0$, so $w_1=1+0=\mathbf{1}$
+- **Step 5:** $t_1=0.25$
+- **Steps 2–4 ($i=1$):** slope $f(0.25,1)=-2(0.25)(1)=-0.5$, increment $0.25\times(-0.5)=-0.125$, so $w_2=1-0.125=\mathbf{0.875}$
+- **Step 5:** $t_2=0.5$
+
+**Result:** $y(0.5)\approx0.875$, against the exact $e^{-0.25}=0.7788$. Euler overshoots here: the curve bends down faster than the tangent line predicts.
+
+### Worked example B: a system, $x'=y$, $y'=-x$, $x(0)=1$, $y(0)=0$, $h=0.1$
+
+*Same recipe applied to each variable at once. Always use the **old** values on the right-hand side.*
+
+| $i$ | $t_i$ | $x_i$ | $y_i$ | slope of $x$ is $y_i$ | slope of $y$ is $-x_i$ | $x_{i+1}=x_i+h\,y_i$ | $y_{i+1}=y_i-h\,x_i$ |
+|---|---|---|---|---|---|---|---|
+| 0 | 0 | 1 | 0 | 0 | −1 | $1+0.1(0)=1$ | $0+0.1(-1)=-0.1$ |
+| 1 | 0.1 | 1 | −0.1 | −0.1 | −1 | $1+0.1(-0.1)=0.99$ | $-0.1+0.1(-1)=-0.2$ |
+
+Exact at $t=0.2$: $x=\cos0.2=0.9801$ and $y=-\sin0.2=-0.1987$. This is the SIR idea in miniature.
+
+### Worked example C: lecture IVP, written in exam layout
+
+$y'=3t-\frac yt$, $y(1)=2$, $h=0.5$
+$$\begin{aligned}
+t_0&=1, & w_0&=2\\
+t_1&=1.5, & y(1.5)\approx w_1&=w_0+hf(t_0,w_0)=2+0.5\,f(1,2)=2+0.5\left(3-\tfrac21\right)=2.5\\
+t_2&=2, & y(2)\approx w_2&=w_1+hf(t_1,w_1)=2.5+0.5\left(4.5-\tfrac{2.5}{1.5}\right)=3.9167
+\end{aligned}$$
+
+---
+
 ## Traps
 
 - $f(t_i,w_i)$ uses the **current** $t$ and $w$, so update $t$ **after** using it.

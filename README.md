@@ -35,7 +35,20 @@ flowchart LR
 | [notes/week13_cholesky.md](notes/week13_cholesky.md) | SPD matrices, Cholesky factorisation | Q16 |
 | [notes/99_exam_playbook.md](notes/99_exam_playbook.md) | Question map, MATLAB bug catalogue, derivations, A4 sheet plan | all |
 
-Each week page follows the same layout: **the point → diagram → formulas → derivations → worked examples → traps → practice questions** (answers are hidden in collapsible sections).
+Each week page follows the same layout: **the point → diagram → formulas → derivations → worked examples → step-by-step walkthroughs → traps → practice questions** (answers are hidden in collapsible sections).
+
+The **step-by-step walkthroughs** break each method into numbered steps, saying what you do and *why*. They then work 2–3 extra examples where every line is labelled with the step it performs.
+
+## Practice exams
+
+Two full papers in the real exam's format (16 questions, 80 marks, 3 MATLAB bug-fix questions), with fully worked, mark-annotated solutions:
+
+| Paper | Solutions | Covers |
+|---|---|---|
+| [Practice Exam 1](practice_exams/practice_exam_1.md) | [Solutions](practice_exams/practice_exam_1_solutions.md) | Modified Euler, Taylor 2 derivation, Lagrange + bound, secant & Simpson MATLAB bugs, Newton for $\sqrt[4]a$ |
+| [Practice Exam 2](practice_exams/practice_exam_2.md) | [Solutions](practice_exams/practice_exam_2_solutions.md) | Taylor 2, Modified Euler derivation, RK4 & fixed-point & Lagrange MATLAB bugs, secant for $\sqrt[3]a$, Simpson derivation |
+
+Do them **timed (3 hours)** after the 2023–2025 papers.
 
 ## Exam at a glance
 
@@ -55,6 +68,9 @@ Each week page follows the same layout: **the point → diagram → formulas →
 ```
 .
 ├── README.md          ← you are here
+├── practice_exams/
+│   ├── practice_exam_1.md, practice_exam_1_solutions.md
+│   └── practice_exam_2.md, practice_exam_2_solutions.md
 └── notes/
     ├── README.md      ← detailed guide to the notes
     ├── 00_big_picture_methods.md

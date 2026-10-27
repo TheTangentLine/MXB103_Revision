@@ -85,6 +85,51 @@ Values: $1.0000,\ 0.9980,\ 0.9689,\ 0.8459,\ 0.5403$, giving $T=0.8958$ and $S=0
 
 ---
 
+## Step-by-step: what each step is doing
+
+| Step | What you do | Why |
+|---|---|---|
+| 1 | $h=\frac{b-a}{n}$ | The strip width. For Simpson, check that $n$ is **even** |
+| 2 | List $x_0=a,\ x_1=a+h,\ \dots,\ x_n=b$ | Where the function is sampled |
+| 3 | Evaluate (or read off) $f(x_i)$ | The heights of $f$ at the sample points |
+| 4 | Attach the weights: Trapezoid $1,2,2,\dots,2,1$; Simpson $1,4,2,4,\dots,2,4,1$ | Each weight counts how many strips (or parabolas) share that point and how heavily they use it |
+| 5 | Add up the weighted bracket | One number |
+| 6 | Multiply by $h/2$ (Trapezoid) or $h/3$ (Simpson) | Converts heights into area |
+
+**Where the weights come from:**
+- **Trapezoid:** each strip has area $\frac h2(f_{\text{left}}+f_{\text{right}})$. An interior point is the right end of one strip and the left end of the next, so it is counted twice. Hence weight **2**.
+- **Simpson:** each parabola over $[x_{2i},x_{2i+2}]$ contributes $\frac h3(1,4,1)$. Odd points are parabola middles (weight **4**). Even interior points are shared by two parabolas ($1+1=$ **2**).
+
+### Worked example A: $\int_0^\pi\sin x\,dx$ (exact 2), $n=4$
+
+- **Step 1:** $h=\pi/4$
+- **Step 2:** $x=0,\ \frac\pi4,\ \frac\pi2,\ \frac{3\pi}4,\ \pi$
+- **Step 3:** $f=0,\ 0.7071,\ 1,\ 0.7071,\ 0$
+
+| Step | Trapezoid | Simpson |
+|---|---|---|
+| 4 | weights $1,2,2,2,1$ | weights $1,4,2,4,1$ |
+| 5 | $0+2(0.7071)+2(1)+2(0.7071)+0=4.8284$ | $0+4(0.7071)+2(1)+4(0.7071)+0=7.6569$ |
+| 6 | $\frac{\pi/4}{2}\times4.8284=\mathbf{1.8961}$ (err 0.104) | $\frac{\pi/4}{3}\times7.6569=\mathbf{2.0046}$ (err 0.0046) |
+
+### Worked example B: $\int_1^4\sqrt x\,dx$ (exact $\frac{14}{3}=4.66667$), $n=6$, showing the weight pattern for longer sums
+
+- **Steps 1–2:** $h=0.5$, $x=1,1.5,2,2.5,3,3.5,4$
+- **Step 3:** $f=1,\ 1.2247,\ 1.4142,\ 1.5811,\ 1.7321,\ 1.8708,\ 2$
+
+| $i$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| $f_i$ | 1 | 1.2247 | 1.4142 | 1.5811 | 1.7321 | 1.8708 | 2 |
+| Trapezoid weight | 1 | 2 | 2 | 2 | 2 | 2 | 1 |
+| Simpson weight | 1 | **4** | 2 | **4** | 2 | **4** | 1 |
+
+- **Trapezoid:** $\frac{0.5}{2}\big[1+2(1.2247+1.4142+1.5811+1.7321+1.8708)+2\big]=0.25\times18.6458=\mathbf{4.6615}$
+- **Simpson:** $\frac{0.5}{3}\big[1+4(1.2247+1.5811+1.8708)+2(1.4142+1.7321)+2\big]=\frac{27.9990}{6}=\mathbf{4.6665}$
+
+Simpson's error is $0.0002$ against $0.005$ for the trapezoid.
+
+---
+
 ## 4. MATLAB trapezoid bugs (2025 Q13, 6 marks)
 
 ```matlab

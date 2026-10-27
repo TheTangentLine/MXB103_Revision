@@ -112,6 +112,81 @@ $$\boxed{\begin{aligned}k_1&=h\,f(t_i,\ w_i)\\k_2&=h\,f\!\left(t_i+\tfrac h2,\ w
 
 ---
 
+## Step-by-step: what each step is doing
+
+### Second-order Taylor: one step
+
+| Step | What you do | What it means |
+|---|---|---|
+| 1 | Write $f(t,y)$ | The slope rule |
+| 2 | Find $f'(t,y)=\frac{\partial f}{\partial t}+\frac{\partial f}{\partial y}\cdot f$ | How fast the slope itself is changing, i.e. the curvature of the solution |
+| 3 | Evaluate $f(t_i,w_i)$ and $f'(t_i,w_i)$ | The slope and curvature at the current point |
+| 4 | $w_{i+1}=w_i+hf+\frac{h^2}{2}f'$ | Tangent-line step **plus** a bending correction (the next Taylor term) |
+
+### Modified Euler: one step
+
+| Step | What you do | What it means |
+|---|---|---|
+| 1 | $k_1=hf(t_i,w_i)$ | The Euler increment, using the slope at the **start** |
+| 2 | Predict the end point: $(t_i+h,\ w_i+k_1)$ | Where plain Euler would land |
+| 3 | $k_2=hf(t_i+h,\ w_i+k_1)$ | The increment using the slope at the **predicted end** |
+| 4 | $w_{i+1}=w_i+\frac12(k_1+k_2)$ | Average the two, like the trapezoidal rule in time |
+
+### RK4: one step
+
+| Step | What you do | What it means |
+|---|---|---|
+| 1 | $k_1=hf(t_i,w_i)$ | Increment from the slope at the start |
+| 2 | $k_2=hf(t_i+\frac h2,\ w_i+\frac{k_1}2)$ | Use $k_1$ to walk **half** a step, then sample the slope at the midpoint |
+| 3 | $k_3=hf(t_i+\frac h2,\ w_i+\frac{k_2}2)$ | Redo the midpoint sample, using the better estimate $k_2$ |
+| 4 | $k_4=hf(t_i+h,\ w_i+k_3)$ | Use $k_3$ to walk a **full** step, then sample the slope at the end |
+| 5 | $w_{i+1}=w_i+\frac16(k_1+2k_2+2k_3+k_4)$ | Weighted average: midpoints count double (like Simpson's $1,4,1$) |
+
+> **Calculator tip:** keep $k$ values to at least 5–6 significant figures. Rounding $k_1$ early spoils $k_2$, $k_3$ and $k_4$.
+
+### Worked example A: one IVP, all three methods (so you can compare)
+
+$y'=-2ty$, $y(0)=1$, $h=0.25$. Find $y(0.25)$. The exact value is $e^{-0.0625}=\mathbf{0.939413}$.
+
+**Taylor 2**
+- **Step 1:** $f=-2ty$
+- **Step 2:** $f'=\frac{\partial}{\partial t}(-2ty)+\frac{\partial}{\partial y}(-2ty)\cdot f=-2y+(-2t)(-2ty)=-2y+4t^2y$
+- **Step 3:** at $(0,1)$, $f=0$ and $f'=-2$
+- **Step 4:** $w_1=1+0.25(0)+\frac{0.0625}{2}(-2)=\mathbf{0.9375}$ (error $0.0019$)
+
+**Modified Euler**
+- **Step 1:** $k_1=0.25\,f(0,1)=0$
+- **Step 2:** predicted end point is $(0.25,\ 1)$
+- **Step 3:** $k_2=0.25\,f(0.25,1)=0.25(-0.5)=-0.125$
+- **Step 4:** $w_1=1+\frac12(0-0.125)=\mathbf{0.9375}$ (error $0.0019$)
+
+**RK4**
+- **Step 1:** $k_1=0.25\,f(0,1)=0$
+- **Step 2:** midpoint $(0.125,\ 1+0)$, so $k_2=0.25(-2)(0.125)(1)=-0.0625$
+- **Step 3:** midpoint $(0.125,\ 1-0.03125=0.96875)$, so $k_3=0.25(-2)(0.125)(0.96875)=-0.060547$
+- **Step 4:** end point $(0.25,\ 1-0.060547=0.939453)$, so $k_4=0.25(-2)(0.25)(0.939453)=-0.117432$
+- **Step 5:** $w_1=1+\frac16\big(0+2(-0.0625)+2(-0.060547)-0.117432\big)=1-\frac{0.363525}{6}=\mathbf{0.939412}$ (error $0.000001$)
+
+RK4 is over 1000× more accurate here, for 4 slope evaluations instead of 2.
+
+### Worked example B: Modified Euler, two steps ($y'=t-y$, $y(0)=1$, $h=0.1$)
+
+| $i$ | $t_i$ | $w_i$ | $k_1=hf(t_i,w_i)$ | predicted end point | $k_2=hf(\text{end})$ | $w_{i+1}=w_i+\frac{k_1+k_2}{2}$ |
+|---|---|---|---|---|---|---|
+| 0 | 0 | 1 | $0.1(0-1)=-0.1$ | $(0.1,\ 0.9)$ | $0.1(0.1-0.9)=-0.08$ | $1-0.09=0.91$ |
+| 1 | 0.1 | 0.91 | $0.1(0.1-0.91)=-0.081$ | $(0.2,\ 0.829)$ | $0.1(0.2-0.829)=-0.0629$ | $0.91-0.07195=0.83805$ |
+
+Exact $y(0.2)=0.837462$, so the error is $0.0006$. Euler gave $0.82$ (error $0.017$).
+
+### Worked example C: the chain rule for $f'$, step by step ($f=t\,y^2$)
+
+1. $\dfrac{\partial f}{\partial t}=y^2$ (treat $y$ as constant)
+2. $\dfrac{\partial f}{\partial y}=2ty$ (treat $t$ as constant)
+3. Multiply the $y$-part by $y'=f$: $2ty\cdot(ty^2)=2t^2y^3$
+4. Add: $f'(t,y)=y^2+2t^2y^3$
+
+---
+
 ## 5. MATLAB bug catalogue: ODE code (Q4 every year)
 
 | Year | Code for | Bug 1 | Bug 2 | Bug 3 |

@@ -134,4 +134,6 @@ Each question asks for **3 errors**, worth 1 mark to identify + 1 to fix each. S
 2. **Day 2:** work through the weak topics with the week files and their practice questions; write out every derivation in §3 from memory.
 3. **Day 3:** do the 2024 paper timed; drill the MATLAB catalogue.
 4. **Day 4:** do the 2025 paper timed (watch for the solution errors in §5); finalise the A4 sheet.
-5. **Night before:** reread the traps sections and the A4 sheet. **Check that your calculator is in radian mode.**
+5. **Day 5:** do [Practice Exam 1](../practice_exams/practice_exam_1.md) timed, mark it with [its solutions](../practice_exams/practice_exam_1_solutions.md), and revisit the step-by-step sections for anything you dropped marks on.
+6. **Day 6:** do [Practice Exam 2](../practice_exams/practice_exam_2.md) timed, then mark it with [its solutions](../practice_exams/practice_exam_2_solutions.md).
+7. **Night before:** reread the traps sections and the A4 sheet. **Check that your calculator is in radian mode.**
