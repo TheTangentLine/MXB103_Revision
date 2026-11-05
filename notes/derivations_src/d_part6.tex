@@ -1,0 +1,138 @@
+% ======================= WEEKS 12-13 =======================
+\topic{Weeks 12--13: Linear systems}
+
+\begin{deriv}{D12.1}{Forward substitution}{\stwo}
+\goal{solve a lower triangular system $A\mathbf x=\mathbf b$ (all zeros above the diagonal).}
+\idea{row 1 contains only $x_1$. Once $x_1$ is known, row 2 contains only one new unknown, and so on downwards.}
+\step{Row $i$ of a lower triangular system only involves $x_1,\dots,x_i$ (the entries $a_{ij}$ with $j>i$ are 0):}
+\[a_{i1}x_1+a_{i2}x_2+\cdots+a_{i,i-1}x_{i-1}+a_{ii}x_i=b_i\]
+\step{Move the already-known terms to the right-hand side, then divide by the diagonal entry:}
+\[x_i=\frac{b_i-\sum_{j=1}^{i-1}a_{ij}x_j}{a_{ii}},\qquad i=1,2,\dots,n\ \ \text{(top to bottom)}\]
+\result{forward substitution. It needs every $a_{ii}\neq0$.}
+\end{deriv}
+
+\begin{deriv}{D12.2}{Backward substitution}{\stwo}
+\goal{solve an upper triangular system (all zeros below the diagonal).}
+\idea{the last row contains only $x_n$. Work upwards.}
+\step{Row $i$ only involves $x_i,\dots,x_n$:\quad $a_{ii}x_i+a_{i,i+1}x_{i+1}+\cdots+a_{in}x_n=b_i$.}
+\step{Move the known terms (those to the right of the diagonal) across, then divide:}
+\[x_i=\frac{b_i-\sum_{j=i+1}^{n}a_{ij}x_j}{a_{ii}},\qquad i=n,n-1,\dots,1\ \ \text{(bottom to top)}\]
+\result{backward substitution. It needs every $a_{ii}\neq0$.}
+\end{deriv}
+
+\begin{deriv}{D12.3}{How LU factorisation solves $A\mathbf x=\mathbf b$}{\sthree\ 2023 Q15b (3 marks)}
+\goal{explain, in words and symbols, how $A=LU$ is used to solve $A\mathbf x=\mathbf b$.}
+\idea{one hard system becomes two easy triangular ones.}
+\step{\mk{1} Replace $A$ by its factorisation, and regroup the brackets (matrix multiplication is associative):}
+\[A\mathbf x=\mathbf b\ \Rightarrow\ (LU)\mathbf x=\mathbf b\ \Rightarrow\ L\,(U\mathbf x)=\mathbf b\]
+\step{Name the bracket $\mathbf z=U\mathbf x$. Then the system reads $L\mathbf z=\mathbf b$.}
+\step{\mk{1} Solve $L\mathbf z=\mathbf b$ for $\mathbf z$ by \textbf{forward substitution} ($L$ is lower triangular).}
+\step{\mk{1} Solve $U\mathbf x=\mathbf z$ for $\mathbf x$ by \textbf{backward substitution} ($U$ is upper triangular).}
+\result{$A\mathbf x=\mathbf b$ $\to$ $L\mathbf z=\mathbf b$ (forward) $\to$ $U\mathbf x=\mathbf z$ (backward). For a new $\mathbf b$, reuse the same $L$ and $U$.}
+\end{deriv}
+
+\begin{deriv}{D12.4}{Doolittle LU formulas (3\,$\times$\,3)}{\sthree\ Q15 every year (2--3 marks for the missing entries)}
+\goal{find formulas for the entries of $L$ (with 1s on its diagonal) and $U$ such that $A=LU$.}
+\idea{multiply $L$ and $U$ out symbolically, set each entry equal to the matching entry of $A$, and solve in an order where only one entry is unknown at a time.}
+\step{Write out the factors:}
+\[L=\begin{bmatrix}1&0&0\\\ell_{21}&1&0\\\ell_{31}&\ell_{32}&1\end{bmatrix},\qquad U=\begin{bmatrix}u_{11}&u_{12}&u_{13}\\0&u_{22}&u_{23}\\0&0&u_{33}\end{bmatrix}\]
+\step{Multiply them: entry $(i,j)$ is (row $i$ of $L$) $\cdot$ (column $j$ of $U$):}
+\[LU=\begin{bmatrix}u_{11}&u_{12}&u_{13}\\[2pt]\ell_{21}u_{11}&\ell_{21}u_{12}+u_{22}&\ell_{21}u_{13}+u_{23}\\[2pt]\ell_{31}u_{11}&\ell_{31}u_{12}+\ell_{32}u_{22}&\ell_{31}u_{13}+\ell_{32}u_{23}+u_{33}\end{bmatrix}\]
+\step{Set $LU=A$ entry by entry and solve in this order: \textbf{row 1 of $U$}, then \textbf{column 1 of $L$}, then \textbf{row 2 of $U$}, then \textbf{column 2 of $L$}, then \textbf{$u_{33}$}:}
+\begin{align*}
+&\text{row 1 of }U: && u_{11}=a_{11},\quad u_{12}=a_{12},\quad u_{13}=a_{13}\\
+&\text{column 1 of }L: && \ell_{21}=\frac{a_{21}}{u_{11}},\quad \ell_{31}=\frac{a_{31}}{u_{11}}\\
+&\text{row 2 of }U: && u_{22}=a_{22}-\ell_{21}u_{12},\quad u_{23}=a_{23}-\ell_{21}u_{13}\\
+&\text{column 2 of }L: && \ell_{32}=\frac{a_{32}-\ell_{31}u_{12}}{u_{22}}\\
+&\text{last entry}: && u_{33}=a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}
+\end{align*}
+\why{in this order, each equation contains exactly one entry you haven't found yet.}
+
+\textbf{Worked example (2024 Q15a).} \emph{What the question gives you:} $A$, and a partly filled-in $L$ and $U$. The boxed entries are the blanks:
+\[\underbrace{\begin{bmatrix}2&1&-4\\-4&-5&10\\6&6&-10\end{bmatrix}}_{A}=\underbrace{\begin{bmatrix}1&0&0\\-2&1&0\\3&\boxed{\ell_{32}}&1\end{bmatrix}}_{L}\underbrace{\begin{bmatrix}2&1&-4\\0&\boxed{u_{22}}&2\\0&0&\boxed{u_{33}}\end{bmatrix}}_{U}\]
+\emph{Your job:} find the three boxed numbers. For each one, take the row of $L$ and column of $U$ that contain it, set their dot product equal to the matching entry of $A$, and solve. (The formulas from Step 3 give the same thing.)
+
+\step{\textbf{Find $u_{22}$} using row 2 of $L$ and column 2 of $U$, which must give $a_{22}=-5$:}
+\[(-2,\ 1,\ 0)\cdot(1,\ u_{22},\ 0)=-2+u_{22}=-5\ \Rightarrow\ u_{22}=-3\qquad\Big(\text{formula: }a_{22}-\ell_{21}u_{12}=-5-(-2)(1)\Big)\]
+
+\step{\textbf{Find $\ell_{32}$} using row 3 of $L$ and column 2 of $U$ (with $u_{22}=-3$ now filled in), which must give $a_{32}=6$:}
+\[(3,\ \ell_{32},\ 1)\cdot(1,\ -3,\ 0)=3-3\ell_{32}=6\ \Rightarrow\ \ell_{32}=-1\qquad\Big(\text{formula: }\tfrac{a_{32}-\ell_{31}u_{12}}{u_{22}}=\tfrac{6-3}{-3}\Big)\]
+
+\step{\textbf{Find $u_{33}$} using row 3 of $L$ (with $\ell_{32}=-1$) and column 3 of $U$, which must give $a_{33}=-10$:}
+\[(3,\ -1,\ 1)\cdot(-4,\ 2,\ u_{33})=-12-2+u_{33}=-10\ \Rightarrow\ u_{33}=4\qquad\Big(\text{formula: }a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}\Big)\]
+
+\chk{row 3 of $L$ times $U$: $\big(3\cdot2,\ 3\cdot1+(-1)(-3),\ -10\big)=(6,6,-10)$, which is row 3 of $A$ \cmark}
+\why{order matters: $u_{22}$ must come before $\ell_{32}$, because the $\ell_{32}$ equation uses $u_{22}$.}
+\result{every Doolittle formula comes from one rule: $a_{ij}=(\text{row }i\text{ of }L)\cdot(\text{column }j\text{ of }U)$.}
+\trap{a zero pivot ($u_{11}=0$ or $u_{22}=0$) makes a division impossible. Pivoting (swapping rows) fixes it.}
+\end{deriv}
+
+\begin{deriv}{D13.1}{Showing a matrix is positive definite}{\sthree\ 2025 Q16a (3 marks)}
+\goal{show $A=\begin{bmatrix}1&-1\\-1&2\end{bmatrix}$ is positive definite, i.e.\ $\mathbf x^TA\mathbf x>0$ for every $\mathbf x\neq\mathbf0$.}
+\idea{multiply $\mathbf x^TA\mathbf x$ out into a quadratic, then complete the square to show it's a sum of squares.}
+\step{\mk{1} State what has to be shown: $\mathbf x^TA\mathbf x>0$ for all nonzero $\mathbf x=(x_1,x_2)^T$.}
+\step{\mk{1} Multiply out, starting with $A\mathbf x$:}
+\[A\mathbf x=\begin{bmatrix}x_1-x_2\\-x_1+2x_2\end{bmatrix},\qquad\mathbf x^TA\mathbf x=x_1(x_1-x_2)+x_2(-x_1+2x_2)=x_1^2-2x_1x_2+2x_2^2\]
+\step{\mk{0.5} Complete the square. Split $2x_2^2=x_2^2+x_2^2$ so that a perfect square appears:}
+\[x_1^2-2x_1x_2+x_2^2+x_2^2=(x_1-x_2)^2+x_2^2\]
+\step{\mk{0.5} Conclude. A sum of squares is $\ge0$. It equals 0 only if $x_2=0$ \emph{and} $x_1=x_2$, which means $\mathbf x=\mathbf0$. So $\mathbf x^TA\mathbf x>0$ for every nonzero $\mathbf x$, and $A$ is positive definite.}
+
+\textbf{General 2\,$\times$\,2 version} \sone. For $A=\begin{bmatrix}a&b\\b&c\end{bmatrix}$ with $a>0$:
+\[\mathbf x^TA\mathbf x=ax_1^2+2bx_1x_2+cx_2^2=a\Big(x_1+\frac bax_2\Big)^2+\Big(c-\frac{b^2}{a}\Big)x_2^2\]
+so $A$ is positive definite exactly when $a>0$ and $ac-b^2>0$.
+\chk{for $\begin{bmatrix}1&-1\\-1&2\end{bmatrix}$: $a=1>0$ and $ac-b^2=2-1=1>0$ \cmark}
+\result{to prove positive definiteness: multiply out $\mathbf x^TA\mathbf x$, write it as a sum of squares, and argue it is 0 only for $\mathbf x=\mathbf0$.}
+\end{deriv}
+
+\begin{deriv}{D13.2}{Cholesky formulas (3\,$\times$\,3)}{\sthree\ Q16 every year (2--3 marks for the missing entries)}
+\goal{find the entries of the lower triangular $L$ with $A=LL^T$, for a symmetric positive definite $A$.}
+\idea{exactly like D12.4: multiply out, equate entries with $A$, and solve column by column.}
+\step{Write the factors ($L^T$ is $L$ reflected across its diagonal):}
+\[L=\begin{bmatrix}\ell_{11}&0&0\\\ell_{21}&\ell_{22}&0\\\ell_{31}&\ell_{32}&\ell_{33}\end{bmatrix},\qquad L^T=\begin{bmatrix}\ell_{11}&\ell_{21}&\ell_{31}\\0&\ell_{22}&\ell_{32}\\0&0&\ell_{33}\end{bmatrix}\]
+\step{Multiply. Only the lower triangle is needed, because $A$ is symmetric:}
+\[LL^T=\begin{bmatrix}\ell_{11}^2&\cdot&\cdot\\[2pt]\ell_{21}\ell_{11}&\ell_{21}^2+\ell_{22}^2&\cdot\\[2pt]\ell_{31}\ell_{11}&\ell_{31}\ell_{21}+\ell_{32}\ell_{22}&\ell_{31}^2+\ell_{32}^2+\ell_{33}^2\end{bmatrix}\]
+\step{Set this equal to $A$ and solve \textbf{column by column}:}
+\begin{align*}
+&\text{column 1}: && \ell_{11}=\sqrt{a_{11}},\quad \ell_{21}=\frac{a_{21}}{\ell_{11}},\quad \ell_{31}=\frac{a_{31}}{\ell_{11}}\\
+&\text{column 2}: && \ell_{22}=\sqrt{a_{22}-\ell_{21}^2},\quad \ell_{32}=\frac{a_{32}-\ell_{31}\ell_{21}}{\ell_{22}}\\
+&\text{column 3}: && \ell_{33}=\sqrt{a_{33}-\ell_{31}^2-\ell_{32}^2}
+\end{align*}
+\why{a diagonal entry comes from a sum of squares, so it needs a square root (take the positive one). An entry below the diagonal comes from a dot product, so it needs a division.}
+
+\textbf{Worked example (2025 Q16b).} \emph{What the question gives you:} $A$, and a partly filled-in $L$ (with $L^T$ beside it). The boxed entries are the blanks:
+\[\underbrace{\begin{bmatrix}36&-12&-6\\-12&13&11\\-6&11&35\end{bmatrix}}_{A}=\underbrace{\begin{bmatrix}\boxed{\ell_{11}}&0&0\\-2&3&0\\-1&\boxed{\ell_{32}}&\boxed{\ell_{33}}\end{bmatrix}}_{L}\underbrace{\begin{bmatrix}\ell_{11}&-2&-1\\0&3&\ell_{32}\\0&0&\ell_{33}\end{bmatrix}}_{L^T}\]
+\emph{Your job:} find the three boxed numbers. Same idea as LU: (row of $L$) $\cdot$ (column of $L^T$) $=$ entry of $A$. Column $j$ of $L^T$ is just row $j$ of $L$, so entry $a_{ij}$ is (row $i$ of $L$) $\cdot$ (row $j$ of $L$).
+
+\step{\textbf{Find $\ell_{11}$} using row 1 $\cdot$ row 1, which must give $a_{11}=36$:}
+\[(\ell_{11},0,0)\cdot(\ell_{11},0,0)=\ell_{11}^2=36\ \Rightarrow\ \ell_{11}=6\qquad\big(\text{take the positive root}\big)\]
+
+\step{\textbf{Find $\ell_{32}$} using row 3 $\cdot$ row 2, which must give $a_{32}=11$:}
+\[(-1,\ \ell_{32},\ \ell_{33})\cdot(-2,\ 3,\ 0)=2+3\ell_{32}=11\ \Rightarrow\ \ell_{32}=3\qquad\Big(\text{formula: }\tfrac{a_{32}-\ell_{31}\ell_{21}}{\ell_{22}}=\tfrac{11-2}{3}\Big)\]
+
+\step{\textbf{Find $\ell_{33}$} using row 3 $\cdot$ row 3, which must give $a_{33}=35$:}
+\[(-1,\ 3,\ \ell_{33})\cdot(-1,\ 3,\ \ell_{33})=1+9+\ell_{33}^2=35\ \Rightarrow\ \ell_{33}^2=25\ \Rightarrow\ \ell_{33}=5\]
+
+\chk{row 2 $\cdot$ row 2 $=(-2)^2+3^2=13=a_{22}$ \cmark, \quad row 2 $\cdot$ row 1 $=(-2)(6)=-12=a_{21}$ \cmark}
+\result{diagonal: $\sqrt{\text{entry}-\text{sum of squares so far}}$; \ below the diagonal: $(\text{entry}-\text{dot product so far})\div\text{diagonal}$.}
+\trap{a negative (or zero) number under a square root means $A$ is \textbf{not} positive definite. The factorisation fails, so switch to LU.}
+\end{deriv}
+
+\begin{deriv}{D13.3}{How Cholesky solves $A\mathbf x=\mathbf b$}{\stwo}
+\goal{solve $A\mathbf x=\mathbf b$ using $A=LL^T$.}
+\step{Replace $A$ and regroup: $\ (LL^T)\mathbf x=\mathbf b\ \Rightarrow\ L\,(L^T\mathbf x)=\mathbf b$.}
+\step{Let $\mathbf z=L^T\mathbf x$. Solve $L\mathbf z=\mathbf b$ by \textbf{forward} substitution.}
+\step{Solve $L^T\mathbf x=\mathbf z$ by \textbf{backward} substitution ($L^T$ is upper triangular).}
+\result{the same two-step idea as LU, with $U=L^T$. It is about half the work, needs no pivoting, and succeeds exactly when $A$ is symmetric positive definite.}
+\end{deriv}
+
+\vspace{8pt}
+\begin{tcolorbox}[enhanced,colback=accentlight,colframe=accent!50,boxrule=0.5pt,arc=2pt]
+\textbf{Final tip.} Many of these derivations share a skeleton:
+\begin{itemize}[leftmargin=16pt,itemsep=1pt]
+\item ODE methods: Taylor about $t_i$ $\to$ evaluate at $t_{i+1}$ $\to$ $y'=f$ $\to$ drop $O(h^{\cdot})$.
+\item Finite differences: expand $f(x_0\pm h)$ $\to$ add or subtract $\to$ rearrange $\to$ IVT.
+\item Quadrature: interpolant in $s$ $\to$ $dx=h\,ds$ $\to$ integrate $\to$ substitute the $\Delta$'s.
+\item Matrix factorisations: multiply out $\to$ equate entries $\to$ solve one unknown at a time.
+\end{itemize}
+Learn the skeletons, and the details become much easier to remember.
+\end{tcolorbox}

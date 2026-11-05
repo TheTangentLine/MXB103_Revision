@@ -1,0 +1,167 @@
+% ======================= WEEKS 5-7 =======================
+\topic{Weeks 5--7: Interpolation}
+
+\textbf{Setting.} We have data points $(x_0,y_0),(x_1,y_1),\dots,(x_n,y_n)$ with \emph{distinct} $x_i$. We want the polynomial $P_n$ of degree $\le n$ with $P_n(x_i)=y_i$ for every $i$. The key theorem: \textbf{such a polynomial exists and is unique}. Every ``form'' below is the same polynomial, written differently.
+
+\begin{deriv}{D5.1}{From two points to the Lagrange form}{\stwo\ lecture derivation; shows where Lagrange comes from}
+\goal{find the line through $(x_0,y_0)$ and $(x_1,y_1)$, and rearrange it into $P_1(x)=\dfrac{x-x_1}{x_0-x_1}y_0+\dfrac{x-x_0}{x_1-x_0}y_1$.}
+\idea{solve for the line directly, then regroup the result by $y_0$ and $y_1$.}
+
+\step{Look for $P_1(x)=a_0+a_1x$. It must pass through both points:}
+\[a_0+a_1x_0=y_0\quad(1)\qquad\qquad a_0+a_1x_1=y_1\quad(2)\]
+
+\step{Subtract (1) from (2) to eliminate $a_0$:}
+\[a_1(x_1-x_0)=y_1-y_0\quad\Rightarrow\quad a_1=\frac{y_1-y_0}{x_1-x_0}\quad\text{(the slope)}\]
+
+\step{Substitute back into (1) and solve for $a_0$:}
+\[a_0=y_0-a_1x_0=\frac{y_0(x_1-x_0)-(y_1-y_0)x_0}{x_1-x_0}=\frac{x_1y_0-x_0y_1}{x_1-x_0}\]
+
+\step{Put both into $P_1$ over a common denominator, then collect the $y_0$ terms and the $y_1$ terms:}
+\[P_1(x)=\frac{x_1y_0-x_0y_1+(y_1-y_0)x}{x_1-x_0}=\frac{y_0\,(x_1-x)+y_1\,(x-x_0)}{x_1-x_0}\]
+
+\step{Split into two fractions. For the $y_0$ term, flip the signs of the top and bottom ($\frac{x_1-x}{x_1-x_0}=\frac{x-x_1}{x_0-x_1}$):}
+\[P_1(x)=\underbrace{\frac{x-x_1}{x_0-x_1}}_{L_{1,0}(x)}y_0+\underbrace{\frac{x-x_0}{x_1-x_0}}_{L_{1,1}(x)}y_1\]
+
+\result{$P_1(x)=L_{1,0}(x)\,y_0+L_{1,1}(x)\,y_1$. Note that $L_{1,0}$ equals 1 at $x_0$ and 0 at $x_1$, and $L_{1,1}$ does the opposite. That pattern is what generalises.}
+\end{deriv}
+
+\begin{deriv}{D5.2}{Why the Lagrange form interpolates}{\stwo}
+\goal{show that $P_n(x)=\sum_{i=0}^nL_{n,i}(x)\,y_i$ with $L_{n,i}(x)=\prod_{j\neq i}\frac{x-x_j}{x_i-x_j}$ passes through every data point.}
+\idea{each $L_{n,i}$ is designed to be 1 at its own node and 0 at all the others.}
+
+\step{\textbf{$L_{n,i}$ is zero at the other nodes.} Its numerator $\prod_{j\ne i}(x-x_j)$ contains the factor $(x-x_k)$ for every $k\neq i$. So at $x=x_k$ that factor is 0:}
+\[L_{n,i}(x_k)=0\qquad(k\neq i)\]
+
+\step{\textbf{$L_{n,i}$ is one at its own node.} At $x=x_i$ the numerator becomes $\prod_{j\ne i}(x_i-x_j)$, which is exactly the denominator:}
+\[L_{n,i}(x_i)=\frac{\prod_{j\ne i}(x_i-x_j)}{\prod_{j\ne i}(x_i-x_j)}=1\]
+\why{this is why the nodes must be distinct: if $x_i=x_j$, the denominator would be 0.}
+
+\step{\textbf{Evaluate $P_n$ at a node $x_k$.} Every term with $i\neq k$ vanishes, and the $i=k$ term has $L_{n,k}(x_k)=1$:}
+\[P_n(x_k)=\sum_iL_{n,i}(x_k)\,y_i=L_{n,k}(x_k)\,y_k=y_k\]
+
+\step{\textbf{Degree.} Each $L_{n,i}$ is a product of $n$ linear factors, so it has degree $n$. A sum of these has degree at most $n$.}
+
+\result{$P_n$ has degree $\le n$ and $P_n(x_k)=y_k$ for every $k$, so it is \emph{the} interpolating polynomial.}
+
+\textbf{Written out for three points:}
+\[P_2(x)=\frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)}y_0+\frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)}y_1+\frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)}y_2\]
+\end{deriv}
+
+\begin{deriv}{D5.3}{Why the Lagrange basis polynomials add up to 1}{\sone\ the arithmetic check}
+\goal{show $\sum_iL_{n,i}(x)=1$ for every $x$.}
+\step{Interpolate the constant function $f(x)=1$. Then every $y_i=1$, so the Lagrange form gives $P_n(x)=\sum_iL_{n,i}(x)\cdot1$.}
+\step{The constant polynomial $1$ also passes through all these points, and it has degree $0\le n$.}
+\step{By uniqueness, these are the same polynomial: $\sum_iL_{n,i}(x)=1$.}
+\result{$\sum_iL_{n,i}(x)=1$. If your computed $L$ values don't add to 1, one of them is wrong.}
+\end{deriv}
+
+\begin{deriv}{D5.4}{Using the interpolation remainder (two cases)}{\stwo\ 2024 Q6b (3 marks)}
+\goal{bound $|f(x)-P_n(x)|$ using $R_n(x)=\dfrac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)(x-x_1)\cdots(x-x_n)$, which is stated without proof.}
+\step{Write $R_n$, with $c$ in the interval containing the nodes and $x$.}
+\step{Bound $|f^{(n+1)}(c)|$ by its \textbf{maximum} over that interval ($c$ is unknown, so use the worst case).}
+\step{Handle the product:}
+\begin{itemize}[leftmargin=18pt,itemsep=1pt]
+\item error at \textbf{one point} $\bar x$: just \emph{evaluate} $|(\bar x-x_0)\cdots(\bar x-x_n)|$;
+\item error for \textbf{all $x$ in an interval}: use the \emph{maximum} of the product (usually given in the exam).
+\end{itemize}
+\step{Multiply and divide by $(n+1)!$.}
+
+\textbf{Worked (2024 Q6b):} $f=\cos x$, nodes $0,\frac\pi6,\frac\pi2$, all $x\in[0,\frac\pi4]$, given $|x(x-\frac\pi6)(x-\frac\pi2)|<0.17$:
+\[|R_2(x)|=\Big|\frac{\sin c}{3!}\Big|\,\Big|x\Big(x-\frac\pi6\Big)\Big(x-\frac\pi2\Big)\Big|<\frac{1}{6}\times0.17=0.0283\]
+\why{$f'''(x)=\sin x$, and $|\sin c|\le1$.}
+\result{error $\le\dfrac{\max|f^{(n+1)}|}{(n+1)!}\times|\text{product}|$ (evaluated at one point, or its max over the interval).}
+\end{deriv}
+
+\begin{deriv}{D6.1}{Newton divided difference coefficients}{\stwo\ lecture derivation}
+\goal{show that the coefficients of $P_n(x)=a_0+a_1(x-x_0)+a_2(x-x_0)(x-x_1)+\cdots$ are the divided differences $a_k=f[x_0,\dots,x_k]$, by checking $a_0$, $a_1$ and $a_2$.}
+\idea{impose $P(x_0)=y_0$, $P(x_1)=y_1$, $P(x_2)=y_2$ one at a time. Each new condition brings in only one new coefficient.}
+
+\step{\textbf{At $x_0$:} every term except $a_0$ contains $(x-x_0)$, so they vanish:}
+\[a_0=y_0=f[x_0]\]
+
+\step{\textbf{At $x_1$:} terms from $a_2$ onwards contain $(x-x_1)$, so they vanish:}
+\[a_0+a_1(x_1-x_0)=y_1\quad\Rightarrow\quad a_1=\frac{y_1-y_0}{x_1-x_0}=f[x_0,x_1]\]
+
+\step{\textbf{At $x_2$:} terms from $a_3$ onwards vanish. Solve for $a_2$:}
+\[a_2=\frac{y_2-y_0-a_1(x_2-x_0)}{(x_2-x_0)(x_2-x_1)}\]
+
+\step{Simplify the numerator. Split $y_2-y_0=(y_2-y_1)+(y_1-y_0)$ and use $a_1=\frac{y_1-y_0}{x_1-x_0}$:}
+\begin{align*}
+y_2-y_0-a_1(x_2-x_0)&=(y_2-y_1)+(y_1-y_0)\Big[1-\frac{x_2-x_0}{x_1-x_0}\Big]\\
+&=(y_2-y_1)+(y_1-y_0)\cdot\frac{x_1-x_2}{x_1-x_0}=(y_2-y_1)-(y_1-y_0)\frac{x_2-x_1}{x_1-x_0}
+\end{align*}
+
+\step{Divide by $(x_2-x_0)(x_2-x_1)$. Dividing the first piece by $(x_2-x_1)$ gives a slope, and the $(x_2-x_1)$ cancels in the second:}
+\[a_2=\frac{\dfrac{y_2-y_1}{x_2-x_1}-\dfrac{y_1-y_0}{x_1-x_0}}{x_2-x_0}=\frac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}=f[x_0,x_1,x_2]\]
+
+\result{$a_0=f[x_0]$, $a_1=f[x_0,x_1]$, $a_2=f[x_0,x_1,x_2]$, and in general $a_k=f[x_0,\dots,x_k]$, the top diagonal of the table.}
+\end{deriv}
+
+\begin{deriv}{D6.2}{Expanding $f[x_0,x_1,x_2,x_3]$}{\sthree\ 2023 Q8 and 2025 Q8 (4 marks, 1 per line)}
+\goal{express $f[x_0,x_1,x_2,x_3]$ using only the $x_i$ and $y_i$.}
+\idea{apply the definition (drop the first point) $-$ (drop the last point), all over (last $x$ $-$ first $x$), again and again until only $f[x_j]=y_j$ remain.}
+
+\step{\mk{1} Apply the definition to the whole thing:}
+\[f[x_0,x_1,x_2,x_3]=\frac{f[x_1,x_2,x_3]-f[x_0,x_1,x_2]}{x_3-x_0}\]
+
+\step{\mk{1} Apply it to each second divided difference:}
+\[=\frac{\dfrac{f[x_2,x_3]-f[x_1,x_2]}{x_3-x_1}-\dfrac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}}{x_3-x_0}\]
+
+\step{\mk{1} Apply it to each first divided difference, $f[x_j,x_{j+1}]=\dfrac{f[x_{j+1}]-f[x_j]}{x_{j+1}-x_j}$:}
+\[=\frac{\dfrac{\frac{f[x_3]-f[x_2]}{x_3-x_2}-\frac{f[x_2]-f[x_1]}{x_2-x_1}}{x_3-x_1}-\dfrac{\frac{f[x_2]-f[x_1]}{x_2-x_1}-\frac{f[x_1]-f[x_0]}{x_1-x_0}}{x_2-x_0}}{x_3-x_0}\]
+
+\step{\mk{1} Replace each $f[x_j]$ by $y_j$:}
+\[f[x_0,x_1,x_2,x_3]=\frac{\dfrac{\frac{y_3-y_2}{x_3-x_2}-\frac{y_2-y_1}{x_2-x_1}}{x_3-x_1}-\dfrac{\frac{y_2-y_1}{x_2-x_1}-\frac{y_1-y_0}{x_1-x_0}}{x_2-x_0}}{x_3-x_0}\]
+
+\result{the 4-line expansion above. Write every level on its own line: each one is a mark.}
+\trap{dividing by the neighbours' gap (e.g.\ $x_3-x_2$) at the second level. A second divided difference over $x_1,x_2,x_3$ divides by the \emph{outer} gap $x_3-x_1$.}
+\end{deriv}
+
+\begin{deriv}{D7.1}{Second and third forward differences}{\stwo}
+\goal{express $\Delta^2y_i$ and $\Delta^3y_i$ in terms of the $y$'s.}
+\idea{$\Delta$ means ``next minus current''. Apply it repeatedly.}
+\step{Definition: $\Delta y_i=y_{i+1}-y_i$.}
+\step{Second difference = $\Delta$ applied to $\Delta y_i$:}
+\[\Delta^2y_i=\Delta y_{i+1}-\Delta y_i=(y_{i+2}-y_{i+1})-(y_{i+1}-y_i)=y_{i+2}-2y_{i+1}+y_i\]
+\step{Third difference = $\Delta$ applied to $\Delta^2y_i$:}
+\[\Delta^3y_i=\Delta^2y_{i+1}-\Delta^2y_i=(y_{i+3}-2y_{i+2}+y_{i+1})-(y_{i+2}-2y_{i+1}+y_i)=y_{i+3}-3y_{i+2}+3y_{i+1}-y_i\]
+\result{the coefficients are Pascal's triangle with alternating signs: $1,-2,1$ and $1,-3,3,-1$.}
+\end{deriv}
+
+\begin{deriv}{D7.2}{Divided differences equal scaled forward differences}{\sthree\ 2024 Q8 (4 marks)}
+\goal{for equally spaced nodes (spacing $h$), show $f[x_0,x_1,x_2]=\dfrac{\Delta^2y_0}{2!\,h^2}$.}
+\idea{write out the divided difference, then use equal spacing: every gap between neighbours is $h$, and the outer gap is $2h$.}
+
+\step{\textbf{Warm-up, $k=1$.} $f[x_0,x_1]=\dfrac{y_1-y_0}{x_1-x_0}=\dfrac{\Delta y_0}{h}=\dfrac{\Delta y_0}{1!\,h^1}$ \cmark}
+
+\step{\mk{1} Apply the definition:}
+\[f[x_0,x_1,x_2]=\frac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}\]
+
+\step{\mk{1} Write out the first divided differences:}
+\[=\frac{\dfrac{y_2-y_1}{x_2-x_1}-\dfrac{y_1-y_0}{x_1-x_0}}{x_2-x_0}\]
+
+\step{Use equal spacing: $x_2-x_1=x_1-x_0=h$ and $x_2-x_0=2h$:}
+\[=\frac{\dfrac{y_2-y_1}{h}-\dfrac{y_1-y_0}{h}}{2h}\]
+
+\step{\mk{2} Simplify. Multiply the top and bottom by $h$, then recognise $\Delta^2y_0$ (D7.1):}
+\[=\frac{(y_2-y_1)-(y_1-y_0)}{2h^2}=\frac{y_2-2y_1+y_0}{2h^2}=\frac{\Delta^2y_0}{2!\,h^2}\]
+
+\result{$f[x_0,x_1,x_2]=\dfrac{\Delta^2y_0}{2!\,h^2}$. In general $f[x_0,\dots,x_k]=\dfrac{\Delta^ky_0}{k!\,h^k}$.}
+\end{deriv}
+
+\begin{deriv}{D7.3}{The Newton forward difference form}{\stwo}
+\goal{for equally spaced nodes, turn the divided-difference form into $P_n(x)=\displaystyle\sum_{k=0}^n\binom sk\Delta^ky_0$ with $s=\frac{x-x_0}{h}$.}
+\idea{substitute $x=x_0+sh$ (Toolkit T4). Every power of $h$ cancels.}
+
+\step{The divided difference form (D6.1): term $k$ is $f[x_0,\dots,x_k]\,(x-x_0)(x-x_1)\cdots(x-x_{k-1})$.}
+
+\step{With $x=x_0+sh$, each factor is $x-x_i=(s-i)h$, so the product of the first $k$ factors is}
+\[(x-x_0)(x-x_1)\cdots(x-x_{k-1})=h^k\,s(s-1)(s-2)\cdots(s-k+1)\]
+
+\step{The coefficient, from D7.2: $f[x_0,\dots,x_k]=\dfrac{\Delta^ky_0}{k!\,h^k}$.}
+
+\step{Multiply them. The $h^k$ cancels:}
+\[\frac{\Delta^ky_0}{k!\,h^k}\cdot h^k\,s(s-1)\cdots(s-k+1)=\frac{s(s-1)\cdots(s-k+1)}{k!}\,\Delta^ky_0=\binom sk\Delta^ky_0\]
+
+\result{$P_n(x)=y_0+s\,\Delta y_0+\dfrac{s(s-1)}{2!}\Delta^2y_0+\dfrac{s(s-1)(s-2)}{3!}\Delta^3y_0+\cdots$, \quad $s=\dfrac{x-x_0}{h}$.}
+\end{deriv}

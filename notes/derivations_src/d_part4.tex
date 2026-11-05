@@ -1,0 +1,116 @@
+% ======================= WEEKS 8-9 =======================
+\topic{Weeks 8--9: Root finding}
+
+\textbf{Setting.} We want $x$ with $f(x)=0$. Any equation can be put in this form by moving everything to one side.
+
+\begin{deriv}{D8.1}{Showing $[a,b]$ is a bracketing}{\sthree\ Q9a every year (2 marks)}
+\goal{show that $f$ has a root in $[a,b]$.}
+\idea{if a continuous function is negative at one end and positive at the other, it must cross zero in between (Intermediate Value Theorem).}
+\step{\mk{0.5 + 0.5} Evaluate $f$ at both ends.}
+\step{\mk{1} State: they have \textbf{opposite signs}, and $f$ is \textbf{continuous} on $[a,b]$, so by the IVT $f$ takes every value between $f(a)$ and $f(b)$, including 0. Hence $[a,b]$ is a bracketing.}
+
+\textbf{Worked (2025 Q9a):} $f(x)=x^3-2x-7$ on $[1,3]$.
+\[f(1)=1-2-7=-8<0,\qquad f(3)=27-6-7=14>0\]
+Opposite signs, and $f$ is a polynomial (so continuous). Hence $[1,3]$ is a bracketing for $f$.
+\result{``$f(a)$ and $f(b)$ have opposite signs and $f$ is continuous, so $[a,b]$ brackets a root.''}
+\end{deriv}
+
+\begin{deriv}{D8.2}{Bisection error bound}{\stwo}
+\goal{show that after $n$ iterations the midpoint $p_n$ satisfies $|p_n-r|\le\dfrac{b-a}{2^n}$, where $r$ is the root.}
+\idea{every iteration halves the bracket, and the root is always inside it.}
+\step{The starting bracket has length $b-a$, and each iteration halves it. So the bracket used in iteration $n$ has length $\dfrac{b-a}{2^{n-1}}$.}
+\step{$p_n$ is the midpoint of that bracket, and the root $r$ is somewhere inside it. A point inside an interval is at most half its length from the midpoint:}
+\[|p_n-r|\le\frac12\cdot\frac{b-a}{2^{n-1}}=\frac{b-a}{2^n}\]
+\step{\textbf{How many iterations for a tolerance?} We need $\frac{b-a}{2^n}\le\text{tol}$, i.e.\ $2^n\ge\frac{b-a}{\text{tol}}$, so $n\ge\log_2\!\frac{b-a}{\text{tol}}$.}
+\result{$|p_n-r|\le\dfrac{b-a}{2^n}$. \ E.g.\ on $[1,3]$ with tol $10^{-3}$: $2^n\ge2000$, so $n=11$.}
+\end{deriv}
+
+\begin{deriv}{D8.3}{Rearranging $f(x)=0$ into $x=g(x)$}{\stwo\ lecture example}
+\goal{find two fixed point forms of $0.9\cos x=\sqrt x$ on $[0,1]$.}
+\idea{any algebra that isolates an $x$ on one side gives a valid $g$. Different choices behave differently.}
+\step{\textbf{Rearrangement 1.} Divide by 0.9, then apply $\cos^{-1}$:}
+\[\cos x=\frac{\sqrt x}{0.9}\quad\Rightarrow\quad x=\cos^{-1}\!\Big(\frac{\sqrt x}{0.9}\Big)=g_1(x)\]
+\step{\textbf{Rearrangement 2.} Square both sides (safe here, since both sides are $\ge0$ on $[0,1]$):}
+\[0.81\cos^2x=x\quad\Rightarrow\quad x=0.81\cos^2x=g_2(x)\]
+\result{same equation, two $g$'s. From $x_0=0.5$, $g_1$ diverges (then becomes undefined), and $g_2$ converges to $0.57$. D8.4 explains why.}
+\end{deriv}
+
+\begin{deriv}{D8.4}{Why $|g'|<1$ makes fixed point iteration converge}{\sone\ explains the fixed point theorem and linear convergence}
+\goal{show that if $|g'(x)|\le k<1$, the errors $|x_n-p|$ shrink to 0.}
+\idea{compare each iterate's distance to the fixed point $p$ with the previous one, using the Mean Value Theorem.}
+\step{The fixed point satisfies $p=g(p)$. Subtract this from $x_{n+1}=g(x_n)$:}
+\[x_{n+1}-p=g(x_n)-g(p)\]
+\step{Mean Value Theorem: $g(x_n)-g(p)=g'(\xi_n)\,(x_n-p)$ for some $\xi_n$ between $x_n$ and $p$:}
+\[x_{n+1}-p=g'(\xi_n)\,(x_n-p)\]
+\step{Take absolute values, and use $|g'|\le k$:}
+\[|x_{n+1}-p|\le k\,|x_n-p|\]
+\step{Apply this repeatedly:}
+\[|x_n-p|\le k\,|x_{n-1}-p|\le k^2|x_{n-2}-p|\le\cdots\le k^n|x_0-p|\ \longrightarrow\ 0\quad\text{since }0\le k<1\]
+\result{the error shrinks by a factor of about $\lambda=|g'(p)|$ each step: \textbf{linear} convergence. If $|g'(p)|>1$ the error \emph{grows}.}
+\end{deriv}
+
+\begin{deriv}{D9.1}{Newton's method from the tangent line}{\sthree\ 2025 Q10 (3 marks)}
+\goal{derive $x_{n+1}=x_n-\dfrac{f(x_n)}{f'(x_n)}$.}
+\idea{replace the curve by its tangent line at $x_n$. Where the tangent hits zero is the next guess.}
+\step{\mk{1} The tangent line to $f$ at $x=x_n$ (the degree-1 Taylor polynomial):}
+\[f(x)\approx f(x_n)+f'(x_n)\,(x-x_n)\]
+\step{\mk{1} Let $x_{n+1}$ be where the tangent line crosses the $x$-axis, i.e.\ set it equal to 0:}
+\[0=f(x_n)+f'(x_n)\,(x_{n+1}-x_n)\]
+\step{\mk{1} Solve for $x_{n+1}$: subtract $f(x_n)$, divide by $f'(x_n)$, then add $x_n$:}
+\[x_{n+1}-x_n=-\frac{f(x_n)}{f'(x_n)}\quad\Rightarrow\quad x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}\]
+\result{Newton's method: $x_{n+1}=x_n-\dfrac{f(x_n)}{f'(x_n)}$. It needs $f'(x_n)\neq0$.}
+\end{deriv}
+
+\begin{deriv}{D9.2}{The secant method from Newton's method}{\stwo}
+\goal{derive $x_{n+1}=x_n-f(x_n)\dfrac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}$.}
+\idea{Newton needs $f'(x_n)$. Replace it by the slope of the line through the last two points.}
+\step{Approximate the derivative by the secant slope (rise over run between the last two iterates):}
+\[f'(x_n)\approx\frac{f(x_n)-f(x_{n-1})}{x_n-x_{n-1}}\]
+\step{Substitute into Newton. Dividing by a fraction means multiplying by its reciprocal:}
+\[x_{n+1}=x_n-\frac{f(x_n)}{\dfrac{f(x_n)-f(x_{n-1})}{x_n-x_{n-1}}}=x_n-f(x_n)\,\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}\]
+\result{secant method. It needs two starting values and no derivative, and its order is about 1.618 (less than Newton's 2).}
+\end{deriv}
+
+\begin{deriv}{D9.3}{Iterations for $\sqrt a$, $\sqrt[3]a$ and more}{\sthree\ Q11: 2024 (Newton, $\sqrt[3]a$) and 2025 (secant, $\sqrt a$), 4 marks}
+\goal{derive an iteration for a root of a number $a>0$.}
+\idea{choose $f(x)$ whose root \emph{is} the number you want (for $\sqrt[k]a$, use $f(x)=x^k-a$), apply the method, then simplify.}
+
+\textbf{(a) Heron's method: Newton for $\sqrt a$} (lecture)
+\step{Choose $f(x)=x^2-a$ (its root is $\sqrt a$), so $f'(x)=2x$.}
+\step{Newton, then split the fraction:}
+\[x_{n+1}=x_n-\frac{x_n^2-a}{2x_n}=x_n-\frac{x_n}{2}+\frac{a}{2x_n}=\frac12\Big(x_n+\frac a{x_n}\Big)\]
+
+\textbf{(b) Newton for $\sqrt[3]a$} (2024 Q11)
+\step{\mk{1.5} Choose $f(x)=x^3-a$ (its root is $\sqrt[3]a$), so $f'(x)=3x^2$.}
+\step{\mk{1.5} Apply Newton:}
+\[x_{n+1}=x_n-\frac{x_n^3-a}{3x_n^2}\]
+\step{\mk{1} Split the fraction into two pieces and simplify:}
+\[x_{n+1}=x_n-\frac{x_n^3}{3x_n^2}+\frac{a}{3x_n^2}=x_n-\frac{x_n}{3}+\frac{a}{3x_n^2}=\frac{2x_n}{3}+\frac{a}{3x_n^2}\]
+
+\textbf{(c) Secant for $\sqrt a$} (2025 Q11)
+\step{\mk{1} Choose $f(x)=x^2-a$.}
+\step{\mk{2} Apply the secant method. In the denominator the $a$'s cancel, leaving a difference of squares:}
+\[x_{n+1}=x_n-(x_n^2-a)\,\frac{x_n-x_{n-1}}{(x_n^2-a)-(x_{n-1}^2-a)}=x_n-(x_n^2-a)\,\frac{x_n-x_{n-1}}{x_n^2-x_{n-1}^2}\]
+\step{\mk{1} Factor $x_n^2-x_{n-1}^2=(x_n-x_{n-1})(x_n+x_{n-1})$ and cancel $(x_n-x_{n-1})$:}
+\[x_{n+1}=x_n-\frac{x_n^2-a}{x_n+x_{n-1}}=x_n+\frac{a-x_n^2}{x_n+x_{n-1}}\]
+
+\textbf{(d) Secant for $\sqrt[3]a$} (Practice Exam 2)
+\step{Same as (c) with $f(x)=x^3-a$, using the difference of cubes $x_n^3-x_{n-1}^3=(x_n-x_{n-1})(x_n^2+x_nx_{n-1}+x_{n-1}^2)$:}
+\[x_{n+1}=x_n-\frac{x_n^3-a}{x_n^2+x_nx_{n-1}+x_{n-1}^2}\]
+
+\textbf{(e) Newton for $\sqrt[4]a$} (Practice Exam 1)
+\step{$f(x)=x^4-a$, $f'(x)=4x^3$:\quad $x_{n+1}=x_n-\dfrac{x_n^4-a}{4x_n^3}=\dfrac{3x_n}{4}+\dfrac{a}{4x_n^3}$.}
+
+\result{the recipe is always: $f=x^k-a$ $\to$ apply the method $\to$ split the fraction (Newton) or factor and cancel (secant).}
+\end{deriv}
+
+\begin{deriv}{D9.4}{Why Newton converges quadratically}{\sone\ explains ``the correct digits double''}
+\goal{show $x_{n+1}-p\approx C\,(x_n-p)^2$, where $p$ is the root.}
+\idea{Taylor-expand $f$ about $x_n$ and evaluate it at the root, where $f(p)=0$.}
+\step{Taylor degree 1 with remainder, centred on $x_n$, evaluated at the root $p$ (where $f(p)=0$):}
+\[0=f(p)=f(x_n)+f'(x_n)(p-x_n)+\frac{f''(\xi)}{2}(p-x_n)^2\]
+\step{Divide by $f'(x_n)$ and rearrange:}
+\[\underbrace{x_n-\frac{f(x_n)}{f'(x_n)}}_{=\,x_{n+1}}-\,p=\frac{f''(\xi)}{2f'(x_n)}\,(x_n-p)^2\]
+\step{So the new error is (a constant) $\times$ (the old error)$^2$: if the error is $10^{-3}$, the next is roughly $10^{-6}$.}
+\result{$|x_{n+1}-p|\approx\Big|\dfrac{f''(p)}{2f'(p)}\Big|\,|x_n-p|^2$: quadratic convergence. It breaks down if $f'(p)=0$ (a repeated root), where Newton is only linear.}
+\end{deriv}

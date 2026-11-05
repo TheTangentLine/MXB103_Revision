@@ -1,0 +1,144 @@
+% ======================= WEEKS 10-11 =======================
+\topic{Weeks 10--11: Numerical differentiation and integration}
+
+\textbf{Notation.} $f_0=f(x_0)$, $f_0'=f'(x_0)$, $f_0''=f''(x_0)$, and so on. All the differentiation formulas come from Toolkit T1 (Taylor with step $h$).
+
+\begin{deriv}{D10.1}{Forward and backward differences, with error terms}{\stwo}
+\goal{derive $f'(x_0)=\dfrac{f(x_0+h)-f(x_0)}{h}-\dfrac h2f''(c)$, and the backward version.}
+\idea{a degree-1 Taylor expansion contains $f'$. Solve for it.}
+\step{Taylor degree 1 with remainder (T1), $c$ between $x_0$ and $x_0+h$:}
+\[f(x_0+h)=f_0+h\,f_0'+\frac{h^2}{2}f''(c)\]
+\step{Move $f_0$ to the left:}
+\[f(x_0+h)-f_0=h\,f_0'+\frac{h^2}{2}f''(c)\]
+\step{Divide by $h$:}
+\[\frac{f(x_0+h)-f_0}{h}=f_0'+\frac h2f''(c)\]
+\step{Rearrange for $f_0'$:}
+\[f'(x_0)=\frac{f(x_0+h)-f(x_0)}{h}-\frac h2f''(c)\qquad\text{(forward, error }O(h))\]
+\step{\textbf{Backward:} replace $h$ by $-h$ everywhere, then tidy the signs (multiply the top and bottom of the fraction by $-1$):}
+\[f'(x_0)=\frac{f(x_0-h)-f(x_0)}{-h}-\frac{(-h)}{2}f''(c)=\frac{f(x_0)-f(x_0-h)}{h}+\frac h2f''(c)\]
+\result{forward: $\dfrac{f(x_0+h)-f(x_0)}{h}$; \ backward: $\dfrac{f(x_0)-f(x_0-h)}{h}$. Both are first order, $O(h)$, with errors of opposite sign.}
+\end{deriv}
+
+\begin{deriv}{D10.2}{Central difference for $f'$, with error term}{\stwo}
+\goal{derive $f'(x_0)=\dfrac{f(x_0+h)-f(x_0-h)}{2h}-\dfrac{h^2}{6}f'''(c)$.}
+\idea{expand $f(x_0+h)$ and $f(x_0-h)$, then \textbf{subtract}: the even-power terms ($f_0$, $f_0''$) cancel, leaving $f_0'$.}
+\step{Degree-2 expansions with remainders (T1), $c_1\in(x_0,x_0+h)$, $c_2\in(x_0-h,x_0)$:}
+\begin{align*}
+f(x_0+h)&=f_0+hf_0'+\frac{h^2}{2}f_0''+\frac{h^3}{6}f'''(c_1)\qquad(1)\\
+f(x_0-h)&=f_0-hf_0'+\frac{h^2}{2}f_0''-\frac{h^3}{6}f'''(c_2)\qquad(2)
+\end{align*}
+\step{Compute (1) $-$ (2). The $f_0$ and $\frac{h^2}{2}f_0''$ terms cancel:}
+\[f(x_0+h)-f(x_0-h)=2hf_0'+\frac{h^3}{6}\big[f'''(c_1)+f'''(c_2)\big]\]
+\step{Divide by $2h$ and rearrange for $f_0'$:}
+\[f'(x_0)=\frac{f(x_0+h)-f(x_0-h)}{2h}-\frac{h^2}{6}\cdot\frac{f'''(c_1)+f'''(c_2)}{2}\]
+\step{Merge the two unknown points with the IVT trick (T3): the average equals $f'''(c)$ for some $c$ between $c_1$ and $c_2$.}
+\result{$f'(x_0)=\dfrac{f(x_0+h)-f(x_0-h)}{2h}-\dfrac{h^2}{6}f'''(c)$, \ $c\in(x_0-h,x_0+h)$. Second order, $O(h^2)$.}
+\end{deriv}
+
+\begin{deriv}{D10.3}{Central difference for $f''$, with error term}{\sthree\ 2023 Q11a (4 marks)}
+\goal{derive $f''(x_0)=\dfrac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}-\dfrac{h^2}{12}f^{(4)}(c)$, \ $c\in(x_0-h,x_0+h)$.}
+\idea{expand $f(x_0\pm h)$ up to $h^3$, then \textbf{add}: the odd-power terms ($f_0'$, $f_0'''$) cancel, leaving $f_0''$.}
+\step{\mk{1} Degree-3 expansions with $h^4$ remainders, $c_1\in(x_0,x_0+h)$, $c_2\in(x_0-h,x_0)$:}
+\begin{align*}
+f(x_0+h)&=f_0+hf_0'+\frac{h^2}{2}f_0''+\frac{h^3}{6}f_0'''+\frac{h^4}{24}f^{(4)}(c_1)\qquad(1)\\
+f(x_0-h)&=f_0-hf_0'+\frac{h^2}{2}f_0''-\frac{h^3}{6}f_0'''+\frac{h^4}{24}f^{(4)}(c_2)\qquad(2)
+\end{align*}
+\why{we go up to $h^3$ because, after adding and dividing by $h^2$, we need to see the size of the error.}
+\step{\mk{1} Add (1) $+$ (2). The $\pm hf_0'$ and $\pm\frac{h^3}{6}f_0'''$ terms cancel:}
+\[f(x_0+h)+f(x_0-h)=2f_0+h^2f_0''+\frac{h^4}{24}\big[f^{(4)}(c_1)+f^{(4)}(c_2)\big]\]
+\step{\mk{1} Rearrange for $f_0''$: subtract $2f_0$, then divide by $h^2$:}
+\[f''(x_0)=\frac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}-\frac{h^2}{24}\big[f^{(4)}(c_1)+f^{(4)}(c_2)\big]\]
+\[\phantom{f''(x_0)}=\frac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}-\frac{h^2}{12}\cdot\frac{f^{(4)}(c_1)+f^{(4)}(c_2)}{2}\]
+\step{\mk{1} IVT (T3): provided $f^{(4)}$ is continuous on $[x_0-h,x_0+h]$, there is a $c$ between $c_1$ and $c_2$ with $f^{(4)}(c)=\dfrac{f^{(4)}(c_1)+f^{(4)}(c_2)}{2}$.}
+\result{$f''(x_0)=\dfrac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}-\dfrac{h^2}{12}f^{(4)}(c)$. Second order, $O(h^2)$.}
+\trap{forgetting to \emph{state} the IVT step. It is worth a mark on its own.}
+\end{deriv}
+
+\begin{deriv}{D10.4}{Second-order forward difference}{\stwo\ lecture problem}
+\goal{derive $f'(x_0)\approx\dfrac{-3f(x_0)+4f(x_0+h)-f(x_0+2h)}{2h}$ with error $O(h^2)$.}
+\idea{use two points to the right. Combine their expansions so the $f''$ terms cancel.}
+\step{Expand both up to $h^3$ (for $x_0+2h$, put $2h$ in place of $h$: $\frac{(2h)^2}{2}=2h^2$ and $\frac{(2h)^3}{6}=\frac43h^3$):}
+\begin{align*}
+f(x_0+h)&=f_0+hf_0'+\frac{h^2}{2}f_0''+\frac{h^3}{6}f_0'''+O(h^4)\qquad(1)\\
+f(x_0+2h)&=f_0+2hf_0'+2h^2f_0''+\frac{4h^3}{3}f_0'''+O(h^4)\qquad(2)
+\end{align*}
+\step{Choose a combination that kills $f_0''$: (1) has $\frac{h^2}{2}f_0''$ and (2) has $2h^2f_0''$, so take $4\times(1)-(2)$:}
+\[4f(x_0+h)-f(x_0+2h)=3f_0+2hf_0'+\Big(\frac{4}{6}-\frac43\Big)h^3f_0'''+O(h^4)=3f_0+2hf_0'-\frac23h^3f_0'''+O(h^4)\]
+\step{Rearrange for $f_0'$: move $3f_0$ across, then divide by $2h$:}
+\[f'(x_0)=\frac{-3f(x_0)+4f(x_0+h)-f(x_0+2h)}{2h}+\frac{h^2}{3}f_0'''+O(h^3)\]
+\result{second-order accuracy using only points to the right (useful at the left end of a table).}
+\end{deriv}
+
+\begin{deriv}{D10.5}{How the choice of $h$ affects accuracy}{\sthree\ 2023 Q11b (2 marks) \quad+\quad \sone\ the calculation}
+\goal{explain why $h$ can be too large \emph{or} too small.}
+\step{\mk{1 + 1} \textbf{Exam answer:} ``Too large a value of $h$ gives inaccuracy from \textbf{truncation error} (the Taylor terms we dropped, $O(h^p)$). Too small a value gives inaccuracy from \textbf{roundoff error}: the numerator subtracts two nearly-equal numbers (catastrophic cancellation), and dividing by a tiny $h$ magnifies it.''}
+
+\step{\textbf{(Understanding) Model the forward difference's total error.} Each stored value of $f$ has relative rounding error up to $\varepsilon$, so the numerator can be off by about $2\varepsilon|f|$. After dividing by $h$:}
+\[E(h)\approx\underbrace{\frac M2\,h}_{\text{truncation}}+\underbrace{\frac{2\varepsilon|f|}{h}}_{\text{roundoff}}\qquad(M\approx|f''|)\]
+\step{Minimise: set $E'(h)=\frac M2-\frac{2\varepsilon|f|}{h^2}=0$, giving $h=2\sqrt{\varepsilon|f|/M}$. With $|f|\approx M$, this is about $\sqrt\varepsilon\approx10^{-8}$ in double precision.}
+\result{for the forward difference the best $h$ is about $\sqrt{\varepsilon}\approx10^{-8}$ (the bottom of the V-shaped error plot). For the central difference it is about $\varepsilon^{1/3}\approx10^{-5}$.}
+\end{deriv}
+
+\begin{deriv}{D11.1}{Trapezoidal rule for one strip}{\sthree\ 2023 Q13a (3 marks)}
+\goal{show $\displaystyle\int_{x_0}^{x_1}P_1(x)\,dx=\frac h2\big[f(x_0)+f(x_1)\big]$, where $P_1$ interpolates $f$ at $x_0$ and $x_1$.}
+\idea{write the straight line in Newton forward difference form, switch to $s$ (T4), then integrate a simple polynomial in $s$.}
+\step{\mk{1} The degree-1 interpolant in forward difference form:}
+\[P_1(x)=y_0+s\,\Delta y_0,\qquad s=\frac{x-x_0}{h},\qquad\Delta y_0=y_1-y_0\]
+\step{Change variable (T4): $x=x_0+sh$ gives $dx=h\,ds$. At $x=x_0$, $s=0$; at $x=x_1$, $s=1$.}
+\step{\mk{1} Integrate in $s$:}
+\[\int_{x_0}^{x_1}P_1\,dx=\int_0^1\big(y_0+s\,\Delta y_0\big)\,h\,ds=h\Big[y_0s+\tfrac12s^2\Delta y_0\Big]_0^1=h\Big(y_0+\tfrac12\Delta y_0\Big)\]
+\step{\mk{1} Substitute $\Delta y_0=y_1-y_0$ and simplify:}
+\[h\Big(y_0+\tfrac12(y_1-y_0)\Big)=h\Big(\tfrac12y_0+\tfrac12y_1\Big)=\frac h2\big[f(x_0)+f(x_1)\big]\]
+\result{$\displaystyle\int_{x_0}^{x_1}f\,dx\approx\frac h2\big[f(x_0)+f(x_1)\big]$, which is the area of a trapezoid.}
+\end{deriv}
+
+\begin{deriv}{D11.2}{Composite trapezoidal rule}{\sthree\ 2023 Q13b (2 marks)}
+\goal{show $\displaystyle\int_a^bf\,dx\approx\frac h2\Big[f(x_0)+2\sum_{i=1}^{n-1}f(x_i)+f(x_n)\Big]$, with $h=\frac{b-a}{n}$.}
+\idea{split $[a,b]$ into $n$ strips, apply D11.1 to each, and add.}
+\step{\mk{1} Split the integral into strips:}
+\[\int_a^bf\,dx=\int_{x_0}^{x_1}f\,dx+\int_{x_1}^{x_2}f\,dx+\cdots+\int_{x_{n-1}}^{x_n}f\,dx\]
+\step{\mk{0.5} Apply D11.1 to every strip:}
+\[\approx\frac h2\big[f_0+f_1\big]+\frac h2\big[f_1+f_2\big]+\cdots+\frac h2\big[f_{n-1}+f_n\big]\]
+\step{\mk{0.5} Collect terms. Each interior point $x_1,\dots,x_{n-1}$ is the right end of one strip and the left end of the next, so it appears \textbf{twice}. The endpoints appear once:}
+\[=\frac h2\Big[f(x_0)+2\big(f(x_1)+\cdots+f(x_{n-1})\big)+f(x_n)\Big]\]
+\result{composite trapezoidal rule, with weights $1,2,2,\dots,2,1$. Error $-\frac{(b-a)h^2}{12}f''(c)$, so second order.}
+\end{deriv}
+
+\begin{deriv}{D11.3}{Simpson's rule for one pair of strips}{\sthree\ 2024 Q13 (5 marks)}
+\goal{show $\displaystyle\int_{x_0}^{x_2}P_2(x)\,dx=\frac h3\big[f(x_0)+4f(x_1)+f(x_2)\big]$.}
+\idea{same as D11.1, but with the degree-2 interpolant and $s$ running from 0 to 2.}
+\step{\mk{1} The degree-2 interpolant in forward difference form. Expand $\frac{s(s-1)}2=\frac12s^2-\frac12s$ ready for integrating:}
+\[P_2(x)=y_0+s\,\Delta y_0+\Big(\tfrac12s^2-\tfrac12s\Big)\Delta^2y_0\]
+\step{Change variable: $dx=h\,ds$. At $x=x_0$, $s=0$; at $x=x_2$, $s=2$.}
+\step{\mk{1} Integrate term by term:}
+\[\int_{x_0}^{x_2}P_2\,dx=h\Big[y_0s+\tfrac12s^2\Delta y_0+\Big(\tfrac16s^3-\tfrac14s^2\Big)\Delta^2y_0\Big]_0^2\]
+\step{Evaluate at $s=2$ (everything is 0 at $s=0$). Note that $\frac16(8)-\frac14(4)=\frac43-1=\frac13$:}
+\[=h\Big[2y_0+2\Delta y_0+\tfrac13\Delta^2y_0\Big]\]
+\step{\mk{1} Substitute $\Delta y_0=y_1-y_0$ and $\Delta^2y_0=y_2-2y_1+y_0$:}
+\[=h\Big[2y_0+2y_1-2y_0+\tfrac13y_2-\tfrac23y_1+\tfrac13y_0\Big]\]
+\step{\mk{1} Collect each $y$: $y_0$: $2-2+\frac13=\frac13$; \ $y_1$: $2-\frac23=\frac43$; \ $y_2$: $\frac13$:}
+\[=h\Big[\tfrac13y_0+\tfrac43y_1+\tfrac13y_2\Big]\]
+\step{\mk{1} Factor out $\frac13$:}
+\[=\frac h3\big[f(x_0)+4f(x_1)+f(x_2)\big]\]
+\result{$\displaystyle\int_{x_0}^{x_2}f\,dx\approx\frac h3\big[f(x_0)+4f(x_1)+f(x_2)\big]$, the area under the parabola through the three points.}
+\end{deriv}
+
+\begin{deriv}{D11.4}{Composite Simpson's rule}{\stwo}
+\goal{show $\displaystyle\int_a^bf\,dx\approx\frac h3\Big[f_0+4\!\!\sum_{\text{odd }i}\!\!f_i+2\!\!\!\sum_{\text{even interior }i}\!\!\!f_i+f_n\Big]$, with $n$ even.}
+\idea{apply D11.3 to consecutive \emph{pairs} of strips, then add. That's why $n$ must be even.}
+\step{Split into pairs: $[x_0,x_2],[x_2,x_4],\dots,[x_{n-2},x_n]$. There are $\frac n2$ pairs, so $n$ must be even.}
+\step{Apply D11.3 to each pair:}
+\[\frac h3\big[f_0+4f_1+f_2\big]+\frac h3\big[f_2+4f_3+f_4\big]+\cdots+\frac h3\big[f_{n-2}+4f_{n-1}+f_n\big]\]
+\step{Collect terms. The \textbf{odd} points are pair middles, so they get weight 4. Each \textbf{even interior} point is shared by two pairs ($1+1$), so it gets weight 2. The ends get weight 1.}
+\result{weights $1,4,2,4,\dots,2,4,1$, multiplied by $\frac h3$. Error $-\frac{(b-a)h^4}{180}f^{(4)}(c)$, so fourth order.}
+\end{deriv}
+
+\begin{deriv}{D11.5}{Why Trapezoid is exact for lines and Simpson is exact for cubics}{\sone}
+\goal{see where the ``exact for degree $\le1$'' and ``exact for degree $\le3$'' facts come from.}
+\step{\textbf{From the error terms.} The trapezoid's error contains $f''$, and $f''=0$ for any straight line, so the error is 0. Simpson's error contains $f^{(4)}$, and $f^{(4)}=0$ for any cubic.}
+\step{\textbf{A direct check that Simpson is exact for $x^3$.} On $[-h,h]$ (nodes $-h,0,h$):}
+\[\int_{-h}^{h}x^3\,dx=0\ \ (\text{odd function}),\qquad\frac h3\big[(-h)^3+4\cdot0+h^3\big]=0\ \cmark\]
+\step{\textbf{And for $x^2$:}}
+\[\int_{-h}^{h}x^2\,dx=\frac{2h^3}{3},\qquad\frac h3\big[h^2+4\cdot0+h^2\big]=\frac{2h^3}{3}\ \cmark\]
+\result{Simpson fits a parabola but is exact one degree higher, for cubics: the symmetric weights cancel the $x^3$ error.}
+\end{deriv}

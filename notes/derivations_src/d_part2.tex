@@ -1,0 +1,149 @@
+% ======================= WEEKS 3-4 =======================
+\topic{Weeks 3--4: ODE methods}
+
+\textbf{Setting for every derivation in this section.} We solve $\dfrac{dy}{dt}=f(t,y)$ on $a\le t\le b$ with $y(a)=\alpha$. We use the grid $h=\frac{b-a}{n}$, $t_i=a+ih$, so $t_{i+1}-t_i=h$. We write $y_i=y(t_i)$ for the exact (unknown) values and $w_i\approx y_i$ for the computed ones.
+
+\textbf{The same four moves appear in every ODE derivation:}
+\begin{center}
+\begin{tabular}{cl}
+\toprule
+1 & Taylor-expand $y(t)$ about $t_i$\\
+2 & Evaluate at $t_{i+1}$, so every $(t-t_i)$ becomes $h$\\
+3 & Use the ODE to replace derivatives of $y$ by $f$\\
+4 & Drop the $O(h^{\cdot})$ term and replace $y_i$ by $w_i$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{deriv}{D3.1}{Euler's method}{\stwo\ the template for every ODE derivation}
+\goal{derive $w_{i+1}=w_i+h\,f(t_i,w_i)$.}
+\idea{a degree-1 Taylor polynomial is the tangent line. Follow the tangent for one step.}
+
+\step{\textbf{Move 1.} Taylor polynomial of degree 1 for $y(t)$ about $t_i$, with remainder:}
+\[y(t)=y(t_i)+y'(t_i)(t-t_i)+\frac{y''(c)}{2}(t-t_i)^2\]
+\why{we know $y$ at $t_i$ and want it at the next time. Taylor predicts nearby values from information at one point.}
+
+\step{\textbf{Move 2.} Evaluate at $t=t_{i+1}$. Since $t_{i+1}-t_i=h$:}
+\[y_{i+1}=y_i+h\,y'(t_i)+\frac{y''(c)}{2}h^2=y_i+h\,y'(t_i)+O(h^2)\]
+\why{$c$ is unknown but $y''$ is bounded, so the last term is at most a constant times $h^2$ (Toolkit T2).}
+
+\step{\textbf{Move 3.} The ODE says $y'(t)=f(t,y(t))$. At $t=t_i$ this gives $y'(t_i)=f(t_i,y_i)$:}
+\[y_{i+1}=y_i+h\,f(t_i,y_i)+O(h^2)\]
+
+\step{\textbf{Move 4.} Drop the $O(h^2)$ term, and replace the exact $y_i$ by the approximations $w_i$:}
+\[w_{i+1}=w_i+h\,f(t_i,w_i),\qquad w_0=\alpha\]
+
+\result{Euler's method: $w_{i+1}=w_i+h\,f(t_i,w_i)$.}
+\why{the term we dropped, $O(h^2)$, is exactly the error made in one step: the \textbf{local error}.}
+\end{deriv}
+
+\begin{deriv}{D3.2}{Local error $O(h^{p+1})$ gives global error $O(h^p)$}{\stwo\ explains ``Euler is first order''}
+\goal{show why a method whose single step has error $O(h^{p+1})$ has total error $O(h^p)$.}
+\idea{the total error is roughly (error per step) $\times$ (number of steps), and the number of steps is $\frac{b-a}{h}$.}
+
+\step{Each step adds an error of at most $C\,h^{p+1}$, for some constant $C$ (the local error).}
+\step{Getting from $a$ to $b$ takes $n=\dfrac{b-a}{h}$ steps.}
+\step{Add up all the steps' errors (roughly, ignoring how earlier errors are carried forward):}
+\[\text{global error}\approx n\times C\,h^{p+1}=\frac{b-a}{h}\times C\,h^{p+1}=C(b-a)\,h^{p}=O(h^p)\]
+\why{one power of $h$ is lost because a smaller $h$ means \emph{more} steps. A careful proof also tracks how earlier errors propagate, but the conclusion is the same.}
+
+\result{local $O(h^{p+1})$ $\Rightarrow$ global $O(h^p)$. Euler: local $O(h^2)$, so global $O(h)$ (\textbf{first order}).}
+\end{deriv}
+
+\begin{deriv}{D4.1}{The total derivative $f'(t,y)$}{\sthree\ every Taylor 2 question: 2025 gave 0 marks if this is wrong}
+\goal{show $f'(t,y)=\dfrac{\partial f}{\partial t}+\dfrac{\partial f}{\partial y}\cdot f(t,y)$, and that $y''=f'(t,y)$.}
+\idea{along the solution, $y$ is itself a function of $t$, so $t$ affects $f$ in two ways: directly, and through $y$.}
+
+\step{Along the solution curve, $y=y(t)$. So $f(t,y(t))$ is really a function of $t$ alone, but $t$ enters it twice: in the first slot directly, and in the second slot through $y(t)$.}
+
+\step{The chain rule for a function of two variables adds up both effects:}
+\[\frac{d}{dt}f\big(t,y(t)\big)=\frac{\partial f}{\partial t}\cdot\frac{dt}{dt}+\frac{\partial f}{\partial y}\cdot\frac{dy}{dt}\]
+
+\step{Simplify: $\frac{dt}{dt}=1$, and $\frac{dy}{dt}=y'=f(t,y)$ by the ODE:}
+\[f'(t,y)=\frac{\partial f}{\partial t}+\frac{\partial f}{\partial y}\cdot f(t,y)\]
+
+\step{Since $y'=f(t,y)$, differentiating once more gives $y''=\frac{d}{dt}f(t,y)=f'(t,y)$.}
+
+\result{$f'(t,y)=f_t+f_y\cdot f$, \quad and \quad $y''=f'(t,y)$.}
+
+\textbf{Worked (lecture): $f(t,y)=3t-\dfrac yt$.}
+\begin{align*}
+\frac{\partial f}{\partial t}&=3+\frac{y}{t^2} &&\text{(treat $y$ as a constant: $\tfrac{d}{dt}(-yt^{-1})=yt^{-2}$)}\\
+\frac{\partial f}{\partial y}&=-\frac1t &&\text{(treat $t$ as a constant)}\\
+f'(t,y)&=3+\frac{y}{t^2}+\Big(-\frac1t\Big)\Big(3t-\frac yt\Big) &&\text{($f_t+f_y\cdot f$)}\\
+&=3+\frac{y}{t^2}-3+\frac{y}{t^2}=\frac{2y}{t^2}
+\end{align*}
+\trap{writing $f'=3+\frac{y}{t^2}$, i.e.\ forgetting the $f_y\cdot f$ part. In MATLAB this is the missing \texttt{*f(t,y)} bug (2023 Q4, 2024 Q4).}
+\end{deriv}
+
+\begin{deriv}{D4.2}{Second-order Taylor method}{\sthree\ 2023 Q5 (4 marks)}
+\goal{derive $w_{i+1}=w_i+h\,f(t_i,w_i)+\dfrac{h^2}{2}f'(t_i,w_i)$.}
+\idea{the same four moves as Euler, but keep one more Taylor term.}
+
+\step{\mk{1} \textbf{Move 1.} Taylor polynomial of degree 2 for $y(t)$ about $t_i$:}
+\[y(t)=y(t_i)+y'(t_i)(t-t_i)+\frac{y''(t_i)}{2}(t-t_i)^2+O\big((t-t_i)^3\big)\]
+
+\step{\mk{1} \textbf{Move 2.} Evaluate at $t=t_{i+1}$, so $t_{i+1}-t_i=h$:}
+\[y_{i+1}=y_i+h\,y'(t_i)+\frac{h^2}{2}y''(t_i)+O(h^3)\]
+
+\step{\mk{1} \textbf{Move 3.} Replace the derivatives of $y$ using the ODE and D4.1: $y'=f(t,y)$ and $y''=f'(t,y)$:}
+\[y_{i+1}=y_i+h\,f(t_i,y_i)+\frac{h^2}{2}f'(t_i,y_i)+O(h^3)\]
+
+\step{\mk{1} \textbf{Move 4.} Drop $O(h^3)$, and replace $y_i$ with $w_i$:}
+\[w_{i+1}=w_i+h\,f(t_i,w_i)+\frac{h^2}{2}f'(t_i,w_i)\]
+
+\result{second-order Taylor method. Local error $O(h^3)$, so global $O(h^2)$ (second order).}
+\end{deriv}
+
+\begin{deriv}{D4.3}{Modified Euler method}{\sthree\ 2024 Q5 and 2025 Q5 (4 marks each)}
+\goal{derive $w_{i+1}=w_i+\dfrac h2\Big[f(t_i,w_i)+f\big(t_{i+1},\,w_i+hf(t_i,w_i)\big)\Big]$.}
+\idea{start from Taylor 2, but get rid of the awkward $f'$ by approximating it with a difference quotient (a slope). Then patch the one remaining problem using Euler.}
+
+\step{\mk{0.5} \textbf{Taylor polynomial of degree 2} for $y(t)$ about $t_i$:}
+\[y(t)=y(t_i)+y'(t_i)(t-t_i)+\frac{y''(t_i)}{2}(t-t_i)^2+O\big((t-t_i)^3\big)\]
+
+\step{\mk{0.5} \textbf{Evaluate at $t_{i+1}$}, so $t_{i+1}-t_i=h$:}
+\[y_{i+1}=y_i+h\,y'(t_i)+\frac{h^2}{2}y''(t_i)+O(h^3)\]
+
+\step{\mk{0.5} \textbf{Replace the derivatives of $y$ by $f$} ($y'=f$, $y''=f'$):}
+\[y_{i+1}=y_i+h\,f(t_i,y_i)+\frac{h^2}{2}f'(t_i,y_i)+O(h^3)\]
+\why{up to here this is just Taylor 2. Next we remove $f'$, because computing it needs the chain rule.}
+
+\step{\mk{0.5} \textbf{Approximate $f'$ by a forward difference}, the slope of $f$ between $t_i$ and $t_{i+1}$ (Week 10, D10.1):}
+\[f'(t_i,y_i)=\frac{f(t_{i+1},y_{i+1})-f(t_i,y_i)}{h}+O(h)\]
+
+\step{\mk{1} \textbf{Substitute and simplify.} To keep it readable, write $f_i=f(t_i,y_i)$ and $f_{i+1}=f(t_{i+1},y_{i+1})$:}
+\begin{align*}
+y_{i+1}&=y_i+h f_i+\frac{h^2}{2}\Big[\frac{f_{i+1}-f_i}{h}+O(h)\Big]+O(h^3)\\
+&=y_i+h f_i+\frac h2\,(f_{i+1}-f_i)+O(h^3) &&\text{($\tfrac{h^2}{2}\cdot\tfrac1h=\tfrac h2$, and $\tfrac{h^2}{2}\cdot O(h)=O(h^3)$)}\\
+&=y_i+\frac h2 f_i+\frac h2 f_{i+1}+O(h^3) &&\text{($h f_i-\tfrac h2 f_i=\tfrac h2 f_i$)}\\
+&=y_i+\frac h2\big[f(t_i,y_i)+f(t_{i+1},y_{i+1})\big]+O(h^3)
+\end{align*}
+
+\step{\textbf{Drop $O(h^3)$ and replace $y$ by $w$:}}
+\[w_{i+1}=w_i+\frac h2\Big[f(t_i,w_i)+f(t_{i+1},\,w_{i+1})\Big]\]
+
+\step{\mk{1} \textbf{Patch the problem: $w_{i+1}$ appears on both sides.} We are trying to \emph{compute} $w_{i+1}$, so it can't be on the right-hand side. Inside $f$ on the right, replace it with Euler's prediction $w_{i+1}\approx w_i+h\,f(t_i,w_i)$:}
+\[w_{i+1}=w_i+\frac h2\Big[f(t_i,w_i)+f\big(t_{i+1},\,w_i+h\,f(t_i,w_i)\big)\Big]\]
+\why{Euler's error inside $f$ is $O(h^2)$. It's multiplied by $\frac h2$, so it only adds $O(h^3)$, which is the same size as the error we already dropped. The method stays second order.}
+
+\step{\textbf{(Optional) the $k$-form.} Name the two increments $k_1=h\,f(t_i,w_i)$ and $k_2=h\,f(t_i+h,\,w_i+k_1)$. Then $\frac h2[\,\cdot\,]=\frac12(k_1+k_2)$:}
+\[w_{i+1}=w_i+\tfrac12(k_1+k_2)\]
+
+\result{Modified Euler: $w_{i+1}=w_i+\frac h2\big[f(t_i,w_i)+f(t_{i+1},w_i+hf(t_i,w_i))\big]$. Global $O(h^2)$, with no $f'$ needed.}
+\end{deriv}
+
+\begin{deriv}{D4.4}{RK4: what you need to know (no derivation required)}{\sone}
+\goal{know the RK4 formulas, and see why they make sense.}
+\step{The lectures state RK4 without derivation (it takes ``laborious algebra''). You need the formulas and the order (global $O(h^4)$) only:}
+\begin{align*}
+k_1&=hf(t_i,w_i), & k_2&=hf\big(t_i+\tfrac h2,\,w_i+\tfrac{k_1}{2}\big),\\
+k_3&=hf\big(t_i+\tfrac h2,\,w_i+\tfrac{k_2}{2}\big), & k_4&=hf(t_i+h,\,w_i+k_3)
+\end{align*}
+\[w_{i+1}=w_i+\tfrac16(k_1+2k_2+2k_3+k_4)\]
+
+\step{\textbf{Sanity check: if $f$ depends only on $t$}, then $k_2=k_3=h f(t_i+\frac h2)$, and}
+\[w_{i+1}-w_i=\frac h6\Big[f(t_i)+4f\big(t_i+\tfrac h2\big)+f(t_{i+1})\Big]\]
+\why{that is exactly Simpson's rule (D11.3) on $[t_i,t_{i+1}]$, using the strip half-width $\frac h2$: $\frac{h/2}{3}[f+4f+f]$. So RK4 really is ``Simpson's rule for ODEs'', which is why the weights are $1,2,2,1$.}
+\result{RK4 is a weighted average of four slope samples, and reduces to Simpson's rule when $f=f(t)$.}
+\end{deriv}

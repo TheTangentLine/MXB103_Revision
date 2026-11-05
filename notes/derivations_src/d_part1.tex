@@ -1,0 +1,171 @@
+% ======================= WEEKS 1-2 =======================
+\topic{Weeks 1--2: Floating point, cancellation and Taylor polynomials}
+
+\begin{deriv}{D1.1}{Smallest positive number $S=\beta^m$}{\stwo\ the reasoning behind 2023 Q1b and 2025 Q1a}
+\goal{show that the smallest positive number in $F(\beta,k,m,M)$ is $S=\beta^m$.}
+\idea{a floating point number is (significand) $\times$ (base)$^{\text{exponent}}$. Make \emph{both} parts as small as the rules allow.}
+
+\step{Every nonzero number in the system has the form}
+\[\pm\,d_1.d_2d_3\cdots d_k\times\beta^{e},\qquad d_1\neq0,\qquad m\le e\le M\]
+\why{$d_1\neq0$ is the ``normalised'' rule: it makes every number's representation unique.}
+
+\step{Make the significand as small as possible. The first digit cannot be 0, so the smallest choice is $d_1=1$. Every other digit can be 0:}
+\[d_1.d_2\cdots d_k=1.00\cdots0=1\]
+
+\step{Make the exponent as small as possible: $e=m$, giving the factor $\beta^m$.}
+
+\step{Multiply the two smallest parts:}
+\[S=1\times\beta^{m}=\beta^{m}\]
+
+\result{$S=\beta^m$. \quad Example: $F(2,5,-4,4)$ gives $S=2^{-4}=0.0625$.}
+\why{any positive number smaller than $S$ would need an exponent below $m$, which isn't allowed. It \textbf{underflows} to 0.}
+\end{deriv}
+
+\begin{deriv}{D1.2}{Largest number $L=(\beta-\beta^{1-k})\,\beta^M$}{\stwo}
+\goal{show that the largest number in $F(\beta,k,m,M)$ is $L=(\beta-\beta^{1-k})\beta^M$.}
+\idea{make every digit as large as possible ($\beta-1$) and use the largest exponent $M$, then tidy up the significand with a geometric series.}
+
+\step{The largest digit in base $\beta$ is $\beta-1$ (e.g.\ 9 in base 10, 1 in base 2). Use it for all $k$ digits, with exponent $M$:}
+\[L=(\beta-1).(\beta-1)\cdots(\beta-1)\times\beta^{M}\qquad(k\text{ digits})\]
+
+\step{Write the significand as a sum of place values. The digits sit in the places $\beta^0,\beta^{-1},\dots,\beta^{-(k-1)}$:}
+\[(\beta-1)\Big(1+\beta^{-1}+\beta^{-2}+\cdots+\beta^{-(k-1)}\Big)\]
+
+\step{The bracket is a geometric series with $k$ terms and ratio $r=\beta^{-1}$. Use $1+r+\cdots+r^{k-1}=\frac{1-r^k}{1-r}$ (Toolkit T5):}
+\[1+\beta^{-1}+\cdots+\beta^{-(k-1)}=\frac{1-\beta^{-k}}{1-\beta^{-1}}=\frac{\beta\,(1-\beta^{-k})}{\beta-1}\]
+\why{in the last step, multiply the top and bottom by $\beta$, so the bottom becomes $\beta-1$.}
+
+\step{Multiply by $(\beta-1)$. The $(\beta-1)$ cancels:}
+\[(\beta-1)\cdot\frac{\beta\,(1-\beta^{-k})}{\beta-1}=\beta(1-\beta^{-k})=\beta-\beta^{1-k}\]
+
+\step{Attach the exponent:}
+\[L=(\beta-\beta^{1-k})\,\beta^{M}\]
+
+\result{$L=(\beta-\beta^{1-k})\beta^M$.}
+\why{quick intuition: just as $9.99=10-0.01$, the largest significand is $\beta$ minus one unit in the last place, and that unit is $\beta^{1-k}$.}
+\chk{$F(2,4,-2,3)$: $(2-2^{-3})\times2^3=1.875\times8=15$ \cmark. \quad IEEE double $F(2,53,-1022,1023)$: $(2-2^{-52})\times2^{1023}\approx1.80\times10^{308}$ \cmark}
+\end{deriv}
+
+\begin{deriv}{D1.3}{Why rounding error is at most $u=\tfrac12\beta^{1-k}$}{\sone\ understanding (the lectures state it without proof)}
+\goal{show that $\dfrac{|x-fl(x)|}{|x|}\le\tfrac12\beta^{1-k}$ for any $x$ inside the range of $F$.}
+\idea{rounding to the nearest float is wrong by at most \emph{half a gap}. Measure that gap relative to the size of $x$.}
+
+\step{Write $x$ in normalised form with exponent $e$: $x=d_1.d_2d_3\cdots\times\beta^{e}$, where the significand is between $1$ and $\beta$.}
+
+\step{The floats with exponent $e$ differ only in their last ($k$th) digit, so neighbouring floats are one unit in the last place apart. In the significand that unit is $\beta^{1-k}$, so the actual gap is}
+\[\text{gap}=\beta^{1-k}\,\beta^{e}\]
+
+\step{Rounding to the \emph{nearest} float means $x$ is at most half a gap away from $fl(x)$:}
+\[|x-fl(x)|\le\tfrac12\,\beta^{1-k}\,\beta^{e}\]
+
+\step{The significand is at least 1, so $|x|\ge1\times\beta^{e}=\beta^{e}$.}
+
+\step{Divide the bound in Step 3 by $|x|$, using Step 4 (a smaller denominator can only make the right-hand side bigger):}
+\[\frac{|x-fl(x)|}{|x|}\le\frac{\tfrac12\beta^{1-k}\beta^{e}}{\beta^{e}}=\tfrac12\beta^{1-k}=u\]
+
+\result{$\dfrac{|x-fl(x)|}{|x|}\le u=\tfrac12\beta^{1-k}$, as long as $x$ doesn't overflow or underflow.}
+\end{deriv}
+
+\begin{deriv}{D2.1}{Removing catastrophic cancellation from the quadratic formula}{\sthree\ 2025 Q1b (3 marks)}
+\goal{rewrite $x=\dfrac{-b+\sqrt{b^2-4ac}}{2a}$ so it has no catastrophic cancellation when $b^2\gg4ac$.}
+\idea{multiply by the ``conjugate over itself'' (which equals 1) so the subtraction turns into an addition.}
+
+\step{\mk{1} \textbf{Recognise the danger.} If $b^2\gg4ac$, then $b^2-4ac\approx b^2$, so $\sqrt{b^2-4ac}\approx|b|$. For $b>0$ the numerator is approximately $-b+b$: two nearly-equal numbers are subtracted, which is catastrophic cancellation.}
+
+\step{\mk{1} \textbf{Multiply by the conjugate over itself.} Write $D=b^2-4ac$ to keep things short:}
+\[x=\frac{-b+\sqrt D}{2a}\times\frac{-b-\sqrt D}{-b-\sqrt D}\]
+\why{the second fraction equals 1, so the value of $x$ doesn't change, but the form does.}
+
+\step{\textbf{Numerator: difference of squares.} With $p=-b$ and $q=\sqrt D$, $(p+q)(p-q)=p^2-q^2$:}
+\[(-b+\sqrt D)(-b-\sqrt D)=(-b)^2-(\sqrt D)^2=b^2-(b^2-4ac)=4ac\]
+\why{the $b^2$ terms cancel \emph{exactly in the algebra}. Exact algebraic cancellation is harmless; only cancellation of rounded numbers is dangerous.}
+
+\step{\textbf{Denominator:} $2a(-b-\sqrt D)=-2a\,(b+\sqrt D)$.}
+
+\step{\mk{1} \textbf{Simplify:}}
+\[x=\frac{4ac}{-2a\,(b+\sqrt D)}=\frac{-2c}{b+\sqrt{b^2-4ac}}\]
+
+\result{$x=\dfrac{-2c}{b+\sqrt{b^2-4ac}}$. The denominator \textbf{adds} two positive numbers, so there is no cancellation.}
+
+\why{if instead $b<0$, it's the \emph{other} root $\frac{-b-\sqrt D}{2a}$ that is dangerous. The same trick (multiply by $\frac{-b+\sqrt D}{-b+\sqrt D}$) gives $\dfrac{-2c}{b-\sqrt D}$.}
+\end{deriv}
+
+\begin{deriv}{D2.2}{Other cancellation fixes}{\stwo\ lecture problems; likely exam variations}
+\goal{rewrite each expression so it avoids cancellation in the case shown.}
+
+\step{$1-\cos x$ for $x\approx0$ (since $\cos x\approx1$). Multiply by $\frac{1+\cos x}{1+\cos x}$ and use $1-\cos^2x=\sin^2x$:}
+\[1-\cos x=\frac{(1-\cos x)(1+\cos x)}{1+\cos x}=\frac{1-\cos^2x}{1+\cos x}=\frac{\sin^2x}{1+\cos x}\]
+
+\step{$\log(x+1)-\log x$ for large $x$ (two nearly-equal logs). Use the log rule $\log A-\log B=\log\frac AB$:}
+\[\log(x+1)-\log x=\log\frac{x+1}{x}=\log\Big(1+\frac1x\Big)\]
+
+\step{$\sqrt{x+1}-\sqrt x$ for large $x$. Use the conjugate:}
+\[\sqrt{x+1}-\sqrt x=\frac{(x+1)-x}{\sqrt{x+1}+\sqrt x}=\frac{1}{\sqrt{x+1}+\sqrt x}\]
+
+\step{$\sqrt{x^2+1}-x$ for large $x$. Use the conjugate:}
+\[\sqrt{x^2+1}-x=\frac{(x^2+1)-x^2}{\sqrt{x^2+1}+x}=\frac{1}{\sqrt{x^2+1}+x}\]
+
+\result{every fix turns ``subtract two nearly-equal numbers'' into ``add'' or ``divide''.}
+\end{deriv}
+
+\begin{deriv}{D2.3}{Where the Taylor polynomial's coefficients come from}{\stwo}
+\goal{show that the polynomial matching $f,f',\dots,f^{(n)}$ at $x_0$ is $P_n(x)=\displaystyle\sum_{k=0}^n\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k$.}
+\idea{write a general polynomial in powers of $(x-x_0)$, then choose each coefficient so the derivatives match at $x_0$.}
+
+\step{Write a general degree-$n$ polynomial in powers of $(x-x_0)$:}
+\[P(x)=a_0+a_1(x-x_0)+a_2(x-x_0)^2+a_3(x-x_0)^3+\cdots+a_n(x-x_0)^n\]
+\why{at $x=x_0$, every bracket is 0, so only one term survives each time. That makes the matching easy.}
+
+\step{\textbf{Match the value.} Put $x=x_0$: every term except $a_0$ vanishes, so $P(x_0)=a_0$. We need $P(x_0)=f(x_0)$:}
+\[a_0=f(x_0)\]
+
+\step{\textbf{Match the first derivative.} Differentiate, then put $x=x_0$:}
+\[P'(x)=a_1+2a_2(x-x_0)+3a_3(x-x_0)^2+\cdots\quad\Rightarrow\quad P'(x_0)=a_1=f'(x_0)\]
+
+\step{\textbf{Match the second derivative.}}
+\[P''(x)=2a_2+3\cdot2\,a_3(x-x_0)+\cdots\quad\Rightarrow\quad P''(x_0)=2a_2=f''(x_0)\quad\Rightarrow\quad a_2=\frac{f''(x_0)}{2!}\]
+
+\step{\textbf{Match the third derivative.}}
+\[P'''(x_0)=3\cdot2\cdot1\,a_3=3!\,a_3=f'''(x_0)\quad\Rightarrow\quad a_3=\frac{f'''(x_0)}{3!}\]
+
+\step{\textbf{Spot the pattern.} Differentiating $(x-x_0)^k$ exactly $k$ times leaves $k!$, so in general}
+\[a_k=\frac{f^{(k)}(x_0)}{k!}\]
+
+\result{$P_n(x)=f(x_0)+f'(x_0)(x-x_0)+\dfrac{f''(x_0)}{2!}(x-x_0)^2+\cdots+\dfrac{f^{(n)}(x_0)}{n!}(x-x_0)^n$.}
+\why{the remainder $R_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1}$ is \emph{Taylor's theorem}. MXB103 states it without proof. It looks like ``the next term'', except that the derivative is evaluated at an unknown $c$ between $x_0$ and $x$.}
+\end{deriv}
+
+\begin{deriv}{D2.4}{Taylor polynomial and error bound: the full exam answer}{\sthree\ Q2 every year (6 marks)}
+\goal{(2025 Q2) (a) find $P_2$ for $f(x)=\cos x$ centred on $x_0=0$; \ (b) bound the error for $0\le x\le\pi/3$.}
+\idea{(a) differentiate, evaluate at $x_0$, substitute. \ (b) write the remainder, then replace each unknown by its worst case.}
+
+\textbf{Part (a)}
+
+\step{\mk{1} Write the form of the Taylor polynomial:}
+\[P_2(x)=f(x_0)+f'(x_0)(x-x_0)+\frac{f''(x_0)}{2}(x-x_0)^2\]
+
+\step{\mk{1} Differentiate and evaluate at $x_0=0$:}
+\[f(x)=\cos x\Rightarrow f(0)=1,\qquad f'(x)=-\sin x\Rightarrow f'(0)=0,\qquad f''(x)=-\cos x\Rightarrow f''(0)=-1\]
+
+\step{\mk{1} Substitute:}
+\[P_2(x)=1+0\cdot x+\frac{-1}{2}x^2=1-\frac{x^2}{2}\]
+
+\textbf{Part (b)}
+
+\step{\mk{1} Write the remainder, and say where $c$ is. The next derivative is $f'''(x)=\sin x$:}
+\[R_2(x)=\frac{f'''(c)}{3!}(x-0)^3=\frac{\sin c}{6}\,x^3,\qquad c\text{ between }0\text{ and }x\]
+\why{$x$ is between $0$ and $\pi/3$, so $c$ is too.}
+
+\step{\mk{1} Bound the derivative factor. On $[0,\pi/3]$, $\sin$ is increasing, so its largest value is at the right end:}
+\[|\sin c|\le\sin\tfrac\pi3=\tfrac{\sqrt3}{2}\]
+
+\step{Bound the distance factor. The farthest point of $[0,\pi/3]$ from $x_0=0$ is $\pi/3$:}
+\[|x|^3\le\Big(\frac\pi3\Big)^3\]
+
+\step{\mk{1} Multiply:}
+\[|f(x)-P_2(x)|=|R_2(x)|\le\frac16\cdot\frac{\sqrt3}{2}\cdot\Big(\frac\pi3\Big)^3=0.1658\]
+
+\result{(a) $P_2(x)=1-\dfrac{x^2}2$. \quad (b) Absolute error $\le0.1658$ for all $0\le x\le\pi/3$.}
+
+\trap{when $x_0\neq0$, the distance factor is the farthest distance \emph{from $x_0$}, not the right endpoint. In 2023 Q2 ($x_0=\pi/6$ on $[0,\pi/3]$) it is $\max(|0-\frac\pi6|,|\frac\pi3-\frac\pi6|)=\frac\pi6$, giving the bound $\frac12\big(\frac\pi6\big)^2=\frac{\pi^2}{72}$.}
+\end{deriv}

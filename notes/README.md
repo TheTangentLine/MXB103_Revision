@@ -20,6 +20,8 @@
 | [week11_numerical_integration.md](week11_numerical_integration.md) | Trapezoidal and Simpson's rules | Exam Q13, Q14 |
 | [week12_lu_factorisation.md](week12_lu_factorisation.md) | Triangular systems, LU factorisation | Exam Q15 |
 | [week13_cholesky.md](week13_cholesky.md) | SPD matrices, Cholesky factorisation | Exam Q16 |
+| [formula_sheet.md](formula_sheet.md) · [PDF](formula_sheet.pdf) | **Every formula to memorise**, week by week, each with a short meaning and example. The PDF is typeset with LaTeX for printing; rebuild it after editing the `.md` with `python3 tools/md2tex.py notes/formula_sheet.md notes/formula_sheet.tex && xelatex -output-directory=notes notes/formula_sheet.tex` (run from the repo root) | Memorising, and building your A4 sheet |
+| [derivations.pdf](derivations.pdf) | **Every derivation**, step by step: Goal → Idea → numbered Steps (what and why, with exam marks) → Result. ★★★ marks the ones asked in 2023–2025. Source in [derivations_src/](derivations_src/) | Practising derivations from memory |
 | [99_exam_playbook.md](99_exam_playbook.md) | Question-by-question exam map, **MATLAB bug catalogue**, derivations to memorise, **errors in the official solutions**, A4 sheet plan | The last 2–3 days |
 | [../practice_exams/](../practice_exams/) | **Two full practice exams** with mark-annotated solutions | After the 2023–2025 papers |
 

@@ -1,0 +1,205 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=2cm,top=1.8cm,bottom=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+
+% ---------- colours (same family as the formula sheet) ----------
+\definecolor{accent}{HTML}{1D4E89}
+\definecolor{accentlight}{HTML}{EAF1FA}
+\definecolor{muted}{HTML}{4A5560}
+\definecolor{rem}{HTML}{8A5A00}
+\definecolor{remlight}{HTML}{FFF7E6}
+\definecolor{edge}{HTML}{B03A2E}
+\definecolor{edgelight}{HTML}{FBEDEB}
+\definecolor{good}{HTML}{1E7B3A}
+\definecolor{goodlight}{HTML}{EAF6EE}
+
+% ---------- symbols ----------
+\newcommand{\cmark}{\textcolor{good}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{edge}{\ding{55}}}
+\newcommand{\sthree}{\textcolor{edge}{\ding{72}\ding{72}\ding{72}}}
+\newcommand{\stwo}{\textcolor{rem}{\ding{72}\ding{72}}}
+\newcommand{\sone}{\textcolor{muted}{\ding{72}}}
+
+% ---------- header / footer ----------
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\color{muted}MXB103 Derivations}
+\fancyhead[R]{\small\color{muted}\ifx\topleftxmark\empty\firstleftxmark\else\topleftxmark\fi}
+\fancyfoot[C]{\small\color{muted}\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+% ---------- section headings ----------
+\newcommand{\topic}[1]{\clearpage\extramarks{#1}{#1}\phantomsection\addcontentsline{toc}{section}{#1}%
+  {\color{accent}\Large\bfseries #1\par}\vspace{-2pt}{\color{accent}\rule{\linewidth}{1pt}}\par\vspace{6pt}}
+
+% ---------- derivation box ----------
+\newcounter{stepc}
+\newtcolorbox{deriv}[3]{enhanced,breakable,colback=white,colframe=accent!65,colbacktitle=accentlight,
+  coltitle=accent,fonttitle=\bfseries\large,boxrule=0.6pt,arc=2pt,left=8pt,right=8pt,top=4pt,bottom=6pt,
+  title={#1\quad #2},before skip=10pt,after skip=10pt,
+  before upper={\setcounter{stepc}{0}\phantomsection\addcontentsline{toc}{subsection}{#1\quad #2}%
+    {\small\textbf{Priority:} #3}\par\vspace{3pt}}}
+
+\newcommand{\goal}[1]{{\color{muted}\textbf{Goal:}}\ #1\par\vspace{2pt}}
+\newcommand{\idea}[1]{\begin{tcolorbox}[enhanced,colback=remlight,colframe=rem!40,boxrule=0.4pt,arc=2pt,left=6pt,right=6pt,top=2pt,bottom=2pt]
+  {\color{rem}\textbf{Idea.}}\ #1\end{tcolorbox}}
+\newcommand{\step}[1]{\par\vspace{5pt}\refstepcounter{stepc}\noindent{\color{accent}\textbf{Step \thestepc.}}\ #1\par}
+\newcommand{\mk}[1]{\textcolor{edge}{\textbf{[#1]}}}
+\newcommand{\why}[1]{{\small\color{muted}\textit{Why:} #1\par}}
+\newcommand{\trap}[1]{{\small\textcolor{edge}{\textbf{Common mistake:}}\ #1\par}}
+\newcommand{\result}[1]{\begin{tcolorbox}[enhanced,colback=goodlight,colframe=good!50,boxrule=0.5pt,arc=2pt,left=6pt,right=6pt,top=3pt,bottom=3pt]
+  {\color{good}\textbf{Result.}}\ #1\end{tcolorbox}}
+\newcommand{\chk}[1]{{\small\textcolor{good}{\textbf{Check:}}\ #1\par}}
+
+\allowdisplaybreaks
+
+\begin{document}
+
+% ======================= TITLE & HOW TO USE =======================
+\thispagestyle{plain}
+{\color{accent}\huge\bfseries MXB103 Derivations\par}
+\vspace{2pt}
+{\Large\color{muted} Every formula in the unit, derived slowly, one step at a time\par}
+\vspace{10pt}
+
+Every derivation in this document has the same layout:
+
+\begin{itemize}[leftmargin=16pt,itemsep=2pt]
+\item \textbf{Goal}: the formula we are about to prove.
+\item \textbf{Idea}: the one-sentence plan, so you know where the steps are heading.
+\item \textbf{Steps}: each one says \emph{what} to do and \emph{why}. When the step matches an official marking scheme, its marks are shown in \mk{red}.
+\item \textbf{Result}: the final formula in a green box.
+\end{itemize}
+
+\textbf{Priority stars}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\sthree & Asked in the 2023, 2024 or 2025 exam. \textbf{Learn to write it from memory.}\\
+\stwo & A core building block the exam relies on, or a likely variation.\\
+\sone & For understanding. Not asked directly, but it explains \emph{why} a method works.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{How to practise.} Cover everything below the Goal, write the derivation on blank paper, then compare step by step. A derivation is ``learnt'' when you can do it twice in a row without looking.
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,colback=edgelight,colframe=edge!50,boxrule=0.5pt,arc=2pt,title={\sthree\ The exam derivations (learn these first)},coltitle=edge,colbacktitle=edgelight,fonttitle=\bfseries]
+\small
+\begin{tabular}{@{}lll@{}}
+D2.1 & Cancellation-free quadratic formula & 2025 Q1b (3 marks)\\
+D2.4 & Taylor polynomial + error bound (full layout) & Q2 every year (6 marks)\\
+D4.1 & Total derivative $f'(t,y)$ & needed for every Taylor 2 question\\
+D4.2 & Second-order Taylor method & 2023 Q5 (4 marks)\\
+D4.3 & Modified Euler method & 2024 Q5, 2025 Q5 (4 marks)\\
+D6.2 & Expanding $f[x_0,x_1,x_2,x_3]$ & 2023 Q8, 2025 Q8 (4 marks)\\
+D7.2 & $f[x_0,x_1,x_2]=\Delta^2y_0/(2!\,h^2)$ & 2024 Q8 (4 marks)\\
+D8.1 & Showing $[a,b]$ is a bracketing & Q9a every year (2 marks)\\
+D9.1 & Newton's method from the tangent line & 2025 Q10 (3 marks)\\
+D9.3 & Iterations for $\sqrt a$, $\sqrt[3]a$ (Newton or secant) & Q11 2024, 2025 (4 marks)\\
+D10.3 & Central difference for $f''$ with error term & 2023 Q11a (4 marks)\\
+D10.5 & Effect of $h$ (truncation vs roundoff) & 2023 Q11b (2 marks)\\
+D11.1, D11.2 & Trapezoidal rule (one strip, then composite) & 2023 Q13 (5 marks)\\
+D11.3 & Simpson's rule (one pair of strips) & 2024 Q13 (5 marks)\\
+D12.3 & How LU solves $A\mathbf x=\mathbf b$ (in words) & 2023 Q15b (3 marks)\\
+D12.4 & Doolittle LU formulas & Q15 every year (2--3 marks)\\
+D13.1 & Positive definite by completing the square & 2025 Q16a (3 marks)\\
+D13.2 & Cholesky formulas & Q16 every year (2--3 marks)\\
+\end{tabular}
+\end{tcolorbox}
+
+\vspace{4pt}
+{\small\tableofcontents}
+
+% ======================= TOOLKIT =======================
+\topic{Toolkit: five tools used again and again}
+
+Most derivations in this unit are built from the same five tools. Learn these once, and the derivations become much shorter.
+
+\begin{deriv}{T1}{Taylor's theorem written with a step $h$}{\stwo\ used in Weeks 3, 4, 9 and 10}
+\goal{a way to write $f(x_0+h)$ and $f(x_0-h)$ in terms of $f$ and its derivatives at $x_0$.}
+
+\step{Start from Taylor's theorem (Week 2) centred on $x_0$:}
+\[f(x)=f(x_0)+f'(x_0)(x-x_0)+\frac{f''(x_0)}{2!}(x-x_0)^2+\cdots+\frac{f^{(n)}(x_0)}{n!}(x-x_0)^n+\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1}\]
+\why{this is exact, with $c$ somewhere between $x_0$ and $x$.}
+
+\step{Put $x=x_0+h$. Then $x-x_0=h$, so every bracket becomes a power of $h$:}
+\[f(x_0+h)=f(x_0)+h\,f'(x_0)+\frac{h^2}{2}f''(x_0)+\frac{h^3}{6}f'''(x_0)+\cdots+\frac{h^{n+1}}{(n+1)!}f^{(n+1)}(c)\]
+
+\step{Replace $h$ by $-h$. Even powers keep their sign and odd powers flip:}
+\[f(x_0-h)=f(x_0)-h\,f'(x_0)+\frac{h^2}{2}f''(x_0)-\frac{h^3}{6}f'''(x_0)+\cdots\]
+
+\result{$f(x_0\pm h)=f(x_0)\pm h f'(x_0)+\frac{h^2}{2}f''(x_0)\pm\frac{h^3}{6}f'''(x_0)+\cdots$\quad (signs alternate on odd powers).}
+\end{deriv}
+
+\begin{deriv}{T2}{What $O(h^p)$ means, and the rules for using it}{\stwo\ used in every error analysis}
+\goal{understand why an unknown term like $\frac{y''(c)}{2}h^2$ can be written as $O(h^2)$.}
+
+\step{A term is $O(h^p)$ if it is at most (some fixed constant) $\times\,h^p$ for small $h$.}
+\why{in $\frac{y''(c)}{2}h^2$ we never know $c$, but $|y''|\le M$ on the interval, so the term is at most $\frac M2 h^2$. We keep only the part that matters: how it scales with $h$.}
+
+\step{The rules you need (each follows from ``constant $\times\,h^p$''):}
+\begin{align*}
+h\cdot O(h^p)&=O(h^{p+1}) && \text{(multiplying by $h$ adds one power)}\\
+\tfrac1h\cdot O(h^p)&=O(h^{p-1}) && \text{(dividing by $h$ removes one power)}\\
+O(h^p)+O(h^p)&=O(h^p) && \text{(two such terms is still constant $\times h^p$)}\\
+O(h^p)+O(h^q)&=O(h^p)\ \text{if }p<q && \text{(for small $h$ the lower power is bigger and dominates)}
+\end{align*}
+
+\step{What it predicts: if the error is $\approx C h^p$, halving $h$ divides the error by $2^p$.}
+\result{$O(h)$: halve $h$, error $\div2$.\quad $O(h^2)$: error $\div4$.\quad $O(h^4)$: error $\div16$.}
+\end{deriv}
+
+\begin{deriv}{T3}{The IVT averaging trick (merging two unknown $c$'s into one)}{\stwo\ used in D10.2, D10.3}
+\goal{if $g$ is continuous and $c_1,c_2$ are two points, show there is a single $c$ between them with $g(c)=\frac{g(c_1)+g(c_2)}{2}$.}
+
+\step{The average of two numbers always lies between them:}
+\[\min\{g(c_1),g(c_2)\}\le\frac{g(c_1)+g(c_2)}{2}\le\max\{g(c_1),g(c_2)\}\]
+\step{The Intermediate Value Theorem says a continuous function takes every value between $g(c_1)$ and $g(c_2)$ somewhere between $c_1$ and $c_2$.}
+\step{So it takes the average value at some point $c$ between $c_1$ and $c_2$.}
+\result{$\dfrac{g(c_1)+g(c_2)}{2}=g(c)$ for some $c$ between $c_1$ and $c_2$.}
+\why{finite-difference derivations produce two error terms with different unknown points. This trick tidies them into one.}
+\end{deriv}
+
+\begin{deriv}{T4}{The substitution $x=x_0+sh$ for equally spaced points}{\stwo\ used in D7.3, D11.1--D11.3}
+\goal{rewrite expressions in $x$ in terms of the ``step counter'' $s$.}
+\step{Equally spaced nodes satisfy $x_i=x_0+ih$. Define $s$ by $x=x_0+sh$, i.e.\ $s=\frac{x-x_0}{h}$.}
+\why{$s$ counts how many steps of size $h$ you are from $x_0$: $s=0$ at $x_0$, $s=1$ at $x_1$, $s=2$ at $x_2$, and so on.}
+\step{Each factor $x-x_i$ becomes a multiple of $h$:}
+\[x-x_i=(x_0+sh)-(x_0+ih)=(s-i)\,h\]
+\step{For integrals: $x=x_0+sh$ gives $\frac{dx}{ds}=h$, so $dx=h\,ds$, and the limits change from $x$-values to $s$-values:}
+\[\int_{x_0}^{x_1}(\cdots)\,dx=\int_{0}^{1}(\cdots)\,h\,ds,\qquad\int_{x_0}^{x_2}(\cdots)\,dx=\int_{0}^{2}(\cdots)\,h\,ds\]
+\result{$x-x_i=(s-i)h$,\quad $dx=h\,ds$,\quad $x_i\leftrightarrow s=i$.}
+\end{deriv}
+
+\begin{deriv}{T5}{Algebra identities that keep appearing}{\stwo}
+\begin{align*}
+p^2-q^2&=(p-q)(p+q) && \text{(cancellation fixes; secant for $\sqrt a$)}\\
+p^3-q^3&=(p-q)(p^2+pq+q^2) && \text{(secant for $\sqrt[3]a$)}\\
+1+r+r^2+\cdots+r^{k-1}&=\frac{1-r^k}{1-r}\quad(r\neq1) && \text{(largest floating point number)}\\
+ax^2+2bxy&=a\Big(x+\frac bay\Big)^2-\frac{b^2}{a}y^2 && \text{(completing the square, positive definiteness)}
+\end{align*}
+\chk{expand the right-hand side of each line and you get the left-hand side.}
+\end{deriv}
+
+\input{d_part1}
+\input{d_part2}
+\input{d_part3}
+\input{d_part4}
+\input{d_part5}
+\input{d_part6}
+
+\end{document}

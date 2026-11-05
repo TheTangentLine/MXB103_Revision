@@ -61,6 +61,8 @@ Each question asks for **3 errors**, worth 1 mark to identify + 1 to fix each. S
 
 ## 3. Derivations you must be able to reproduce
 
+> Every derivation below is worked slowly, step by step (with the official mark split), in **[derivations.pdf](derivations.pdf)**.
+
 | Derivation | Appeared | Key move |
 |---|---|---|
 | Euler | (template) | degree-1 Taylor at $t_i$, evaluate at $t_{i+1}$, $y'=f$, drop $O(h^2)$ |

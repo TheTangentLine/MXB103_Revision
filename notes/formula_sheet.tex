@@ -1,0 +1,1003 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,margin=1.5cm,top=1.4cm,bottom=1.6cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{pifont}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{needspace}
+\setlength{\parindent}{0pt}
+\definecolor{accent}{HTML}{1D4E89}
+\definecolor{accentlight}{HTML}{EAF1FA}
+\definecolor{eg}{HTML}{F4F6F8}
+\definecolor{muted}{HTML}{4A5560}
+\definecolor{rem}{HTML}{8A5A00}
+\definecolor{remlight}{HTML}{FFF7E6}
+\newcommand{\cmark}{\textcolor{green!50!black}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{red!70!black}{\ding{55}}}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\color{muted}MXB103 Formula Sheet}
+\fancyhead[R]{\small\color{muted}\ifx\topleftxmark\empty\firstleftxmark\else\topleftxmark\fi}
+\fancyfoot[C]{\small\color{muted}\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\sheettitle}[1]{{\color{accent}\LARGE\bfseries #1\par}\vspace{4pt}}
+\newcommand{\intro}[1]{{\small\color{muted}#1\par}\vspace{6pt}}
+\newcommand{\week}[1]{\needspace{6\baselineskip}\vspace{8pt}\extramarks{#1}{#1}{\color{accent}\large\bfseries #1\par}\vspace{-2pt}{\color{accent}\rule{\linewidth}{0.8pt}}\par\vspace{4pt}}
+\newcommand{\meaningline}[1]{{\small\color{muted}\textit{Meaning:} #1\par}}
+\newcommand{\egline}[1]{{\small\textbf{e.g.}\ #1\par}}
+\newcommand{\egsub}[1]{{\vspace{3pt}\small #1\par}}
+\definecolor{edge}{HTML}{B03A2E}
+\newcommand{\edgesub}[2]{{\vspace{5pt}\small\textcolor{edge}{\textbf{\ding{115}\ #1}}\ #2\par}}
+\newenvironment{egbody}{\small\setlist[itemize]{leftmargin=16pt,itemsep=4pt,topsep=3pt,label=\textcolor{accent}{\textbullet}}}{}
+\newtcolorbox{formulabox}[2]{enhanced,breakable=false,colback=white,colframe=accent!60,colbacktitle=accentlight,
+  coltitle=accent,fonttitle=\bfseries,title={#1\quad #2},boxrule=0.5pt,arc=2pt,left=6pt,right=6pt,top=2pt,bottom=4pt,
+  colbacklower=eg,segmentation style={solid,draw=accent!25},lower separated=true,before skip=5pt,after skip=5pt}
+\newtcolorbox{rembox}{enhanced,colback=remlight,colframe=rem!50,boxrule=0.4pt,arc=2pt,left=6pt,right=6pt,top=3pt,bottom=3pt,
+  fontupper=\small,before upper={{\color{rem}\bfseries Remember}\par},before skip=5pt,after skip=5pt}
+\newtcolorbox{notebox}[1]{enhanced,colback=white,colframe=rem!50,colbacktitle=remlight,coltitle=rem,fonttitle=\bfseries,
+  title={#1},boxrule=0.4pt,arc=2pt,fontupper=\small,before skip=5pt,after skip=5pt}
+\setlist[itemize]{leftmargin=14pt,itemsep=1pt,topsep=2pt}
+\allowdisplaybreaks
+\begin{document}
+\thispagestyle{plain}
+\sheettitle{MXB103 Formula Sheet}
+\intro{Everything you need to \textbf{memorise}, week by week. Each formula has a short \textbf{meaning} and a quick worked example (\textbf{e.g.}) underneath. Each week ends with \textbf{Remember} notes: the non-formula facts the exam keeps testing. Most examples come from the 2023–2025 exams or the lecture problems, so they double as revision of real questions. The full explanations and examples are in each \texttt{weekXX\_*.md} file.}
+\week{Week 1: Errors \& floating point (4 formulas)}
+\begin{formulabox}{1.1}{Absolute and relative error}
+\[\text{abs} = |x-\tilde x|\qquad \text{rel}=\frac{|x-\tilde x|}{|x|}\]
+\meaningline{$x$ = true value, $\tilde x$ = approximation. Relative error $\approx$ the number of correct digits, and it's the one to trust when numbers are very big or very small.}
+\tcblower
+\egline{True value $x=4.0$, approximation $\tilde x=4.1$:}
+\begin{egbody}
+\begin{itemize}
+\item abs $=|4.0-4.1|=0.1$
+\item rel $=\dfrac{0.1}{4.0}=0.025$
+\end{itemize}
+\egsub{Now shrink both: $x=4.0\times10^{-3}$, $\tilde x=4.1\times10^{-3}$:}
+\begin{itemize}
+\item abs $=10^{-4}$ (looks tiny!)
+\item rel $=\dfrac{10^{-4}}{4.0\times10^{-3}}=0.025$ (exactly as good as before)
+\end{itemize}
+\edgesub{Edge case: the true value is 0.}{Relative error is undefined:}
+\begin{itemize}
+\item $x=0$, $\tilde x=10^{-5}$: rel $=\dfrac{10^{-5}}{0}$ is undefined, so report abs $=10^{-5}$ instead
+\item always divide by the \textbf{true} value $|x|$, never by $|\tilde x|$ (a recurring MATLAB bug)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{1.2}{Smallest positive number in $F(\beta,k,m,M)$}
+\[S=1.00\cdots0\times\beta^{m}=\beta^{m}\]
+\meaningline{Smallest significand (1.000\ldots{}) times the smallest exponent. Anything smaller underflows to 0.}
+\tcblower
+\egline{$F(2,5,-4,4)$, so $\beta=2$ and $m=-4$ (2025 Q1a):}
+\begin{egbody}
+\begin{itemize}
+\item smallest significand: $1.0000_2=1$
+\item smallest exponent: $2^{-4}$
+\item $S=1\times2^{-4}=0.0625$
+\end{itemize}
+\edgesub{Edge case: underflow.}{Same system (allowed exponents $-4\le e\le4$):}
+\begin{itemize}
+\item $x=0.1=(1.10011\ldots)_2\times2^{-4}$: $e=-4$ is allowed, so it is stored (rounded) \cmark{}
+\item $x=0.05=(1.10011\ldots)_2\times2^{-5}$: $e=-5<m=-4$, so \textbf{underflow} and $fl(x)=0$ \xmark{}
+\item quick test: $0.05<S=0.0625$, so it was always going to underflow
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{1.3}{Largest number}
+\[L=(\beta-1).(\beta-1)\cdots(\beta-1)\times\beta^{M}=(\beta-\beta^{1-k})\,\beta^{M}\]
+\meaningline{Every digit at its maximum, times the largest exponent. Anything bigger overflows to Inf.}
+\tcblower
+\egline{$F(2,4,-2,3)$, so $\beta=2$, $k=4$, $M=3$:}
+\begin{egbody}
+\begin{itemize}
+\item largest significand: $1.111_2=1+\dfrac12+\dfrac14+\dfrac18=1.875$
+\item largest exponent: $2^3=8$
+\item $L=1.875\times8=15$
+\item formula check: $(2-2^{1-4})\times2^3=(2-0.125)\times8=15$ \cmark{}
+\end{itemize}
+\edgesub{Edge case: overflow.}{Same system (allowed exponents $-2\le e\le3$):}
+\begin{itemize}
+\item $x=13=1101_2=1.101_2\times2^3$: $e=3$ is allowed, so it is stored exactly \cmark{}
+\item $x=20=10100_2=1.0100_2\times2^4$: $e=4>M=3$, so \textbf{overflow} and $fl(x)=$ Inf \xmark{}
+\item sneaky case, $x=15.75=1.11111_2\times2^3$: $e=3$ looks fine, but rounding to 4 digits gives $1.111|11\to10.000_2$, so $x$ becomes $1.000_2\times2^4$. Now $e=4>3$, so \textbf{overflow} \xmark{} (it rounded past $L=15$)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{1.4}{Unit roundoff}
+\[u=\tfrac12\,\beta^{1-k}\qquad\text{so}\qquad\frac{|x-fl(x)|}{|x|}\le u\]
+\meaningline{The worst relative error from rounding a number into $F$. It depends only on the base and the number of digits.}
+\tcblower
+\egline{$F(3,6,-7,8)$, so $\beta=3$ and $k=6$ (2024 Q1b):}
+\begin{egbody}
+\begin{itemize}
+\item $u=\dfrac12\cdot3^{1-6}=\dfrac12\cdot3^{-5}=\dfrac1{486}=0.0021$
+\item meaning: rounding any number into this system gives a relative error of at most $0.21\%$
+\end{itemize}
+\edgesub{Edge case: the bound fails when you underflow.}{In $F(10,2,-1,1)$, $u=\dfrac12\cdot10^{-1}=0.05$:}
+\begin{itemize}
+\item $fl(0.04)=0$ (underflow), so the relative error is $\dfrac{|0.04-0|}{0.04}=1$, far bigger than $u$
+\item $u$ only bounds the rounding of numbers \textbf{inside} the range $[S,L]$
+\item a number already in $F$ has zero error, e.g. $fl(0.23)=0.23$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item $F(\beta,k,m,M)$ stores $\pm d_1.d_2\cdots d_k\times\beta^e$ with $d_1\neq0$ and $m\le e\le M$. Here $k$ counts \textbf{all} digits, including $d_1$.
+\item Decimal $\to$ binary: divide the integer part by 2 (read remainders \textbf{upwards}); multiply the fraction by 2 (read integer parts \textbf{downwards}).
+\item $fl(x)$: convert to base $\beta$ $\to$ normalise $\to$ check exponent $\to$ round to $k$ digits.
+\item IEEE double = $F(2,53,-1022,1023)$, with $u\approx1.11\times10^{-16}$.
+\end{itemize}
+\end{rembox}
+\week{Week 2: Cancellation \& Taylor (3 formulas + 1 recipe)}
+\begin{formulabox}{2.1}{Conjugate trick (removes cancellation)}
+\[A-B=\frac{A^2-B^2}{A+B}\qquad\text{e.g.}\qquad\frac{-b+\sqrt{b^2-4ac}}{2a}=\frac{-2c}{b+\sqrt{b^2-4ac}}\]
+\meaningline{Subtracting nearly-equal rounded numbers destroys digits. Rewrite the formula so it \textbf{adds} instead. Other fixes: $\log A-\log B=\log\frac AB$, and $1-\cos x=\frac{\sin^2x}{1+\cos x}$.}
+\tcblower
+\egline{$\sqrt{x+1}-\sqrt x$ for large $x$:}
+\begin{egbody}
+\[\sqrt{x+1}-\sqrt x=\frac{(\sqrt{x+1}-\sqrt x)(\sqrt{x+1}+\sqrt x)}{\sqrt{x+1}+\sqrt x}=\frac{(x+1)-x}{\sqrt{x+1}+\sqrt x}=\frac{1}{\sqrt{x+1}+\sqrt x}\]
+\egsub{Test at $x=1000$ in 3-digit arithmetic ($\sqrt{1001}\to31.6$, $\sqrt{1000}\to31.6$):}
+\begin{itemize}
+\item original: $31.6-31.6=0$ \xmark{} (every digit lost)
+\item rearranged: $\dfrac{1}{31.6+31.6}=\dfrac1{63.2}=0.0158$ \cmark{} (true $0.015807$)
+\end{itemize}
+\edgesub{Edge case: the sign of $b$ decides which root is dangerous.}{Lecture example $a=1$, $b=-(10^8+10^{-8})$, $c=1$ (roots $10^8$ and $10^{-8}$):}
+\begin{itemize}
+\item $b<0$ makes $-b>0$, so the \textbf{minus} root $\dfrac{-b-\sqrt{b^2-4ac}}{2a}$ subtracts nearly-equal numbers
+\item naive formula in MATLAB: $1.49\times10^{-8}$ \xmark{} (49\% wrong)
+\item safe form $\dfrac{-2c}{b-\sqrt{b^2-4ac}}$: $10^{-8}$ \cmark{}
+\item the plus root is fine here, because it adds two positive numbers
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{2.2}{Taylor polynomial of degree $n$ about $x_0$}
+\[P_n(x)=\sum_{k=0}^{n}\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k=f(x_0)+f'(x_0)(x-x_0)+\frac{f''(x_0)}{2}(x-x_0)^2+\cdots\]
+\meaningline{The polynomial that matches $f$ and its first $n$ derivatives at $x_0$. It's a good approximation \textbf{near} $x_0$.}
+\tcblower
+\egline{$f(x)=\cos x$, degree 2, $x_0=0$:}
+\begin{egbody}
+\begin{itemize}
+\item $f(x)=\cos x$, so $f(0)=1$
+\item $f'(x)=-\sin x$, so $f'(0)=0$
+\item $f''(x)=-\cos x$, so $f''(0)=-1$
+\item substitute: $P_2(x)=1+0\cdot x+\dfrac{-1}{2}x^2=1-\dfrac{x^2}{2}$
+\end{itemize}
+\edgesub{Edge case: missing terms.}{For $\cos x$ about $0$, $f'''(0)=\sin0=0$, so:}
+\begin{itemize}
+\item $P_3(x)=1-\dfrac{x^2}2+0\cdot x^3=P_2(x)$
+\item so you may use the $R_3$ remainder instead, which gives a sharper bound on $[0,\pi/3]$: $\dfrac{x^4}{24}\le\dfrac{(\pi/3)^4}{24}=0.0501$ (vs $0.1658$)
+\end{itemize}
+\edgesub{Edge case: $f$ is already a polynomial of degree $\le n$.}{Then $P_n=f$ exactly. For $f=x^2+3x$ about $x_0=1$ with $n=2$:}
+\begin{itemize}
+\item $f(1)=4$, $f'(1)=5$, $f''(1)=2$
+\item $P_2=4+5(x-1)+(x-1)^2=x^2+3x=f$ \cmark{}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{2.3}{Taylor remainder (error)}
+\[R_n(x)=f(x)-P_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1},\qquad c\text{ between }x_0\text{ and }x\]
+\meaningline{The exact error, but $c$ is unknown. It uses the $(n+1)$th derivative.}
+\tcblower
+\egline{Same $f=\cos x$, $n=2$, $x_0=0$:}
+\begin{egbody}
+\begin{itemize}
+\item the next derivative is $f'''(x)=\sin x$
+\item $R_2(x)=\dfrac{\sin c}{3!}(x-0)^3=\dfrac{\sin c}{6}x^3$, with $c$ between $0$ and $x$
+\end{itemize}
+\edgesub{Edge case: at $x=x_0$ the remainder is 0.}{$R_n(x_0)=f^{(n+1)}(c)\cdot0=0$, because $P_n(x_0)=f(x_0)$ by construction.}
+\edgesub{Edge case: $c$ changes with $x$.}{Every $x$ has its own unknown $c$, so never try to solve for $c$; bound it instead.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{2.4}{Error bound recipe}
+\[|f(x)-P_n(x)|\le\frac{\max|f^{(n+1)}(c)|}{(n+1)!}\cdot\max|x-x_0|^{n+1}\]
+\meaningline{Replace each unknown by its worst case over the interval. The result is an upper bound on the error.}
+\tcblower
+\egline{Same, for $x\in[0,\pi/3]$ (2025 Q2b):}
+\begin{egbody}
+\begin{itemize}
+\item $c\in[0,\pi/3]$, where $\sin$ is increasing, so $|\sin c|\le\sin\dfrac\pi3=\dfrac{\sqrt3}2$
+\item $|x|^3\le\left(\dfrac\pi3\right)^3=1.1484$
+\item error $\le\dfrac{\sqrt3/2}{6}\times1.1484=0.1658$
+\end{itemize}
+\edgesub{Edge case: the maximum may be inside the interval.}{For $|\sin c|$ on $[0,\pi]$:}
+\begin{itemize}
+\item endpoints: $\sin0=0$ and $\sin\pi=0$
+\item but the max is $\sin\dfrac\pi2=1$ in the middle, so the bound must use $1$
+\end{itemize}
+\edgesub{Edge case: interval on both sides of $x_0$.}{For $x_0=0$ on $[-1,2]$: $\max|x-x_0|=\max(1,2)=2$, not 1.}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Truncation error = from cutting maths short (finite terms, finite $h$). Roundoff error = from storing finitely many digits.
+\item Always state where $c$ lies. Calculator in \textbf{radians}.
+\end{itemize}
+\end{rembox}
+\week{Week 3: ODEs \& Euler (3 formulas)}
+\begin{formulabox}{3.1}{Grid}
+\[h=\frac{b-a}{n},\qquad t_i=a+ih,\qquad w_i\approx y(t_i)\]
+\meaningline{Chop $[a,b]$ into $n$ steps of width $h$. The method outputs a \textbf{table} of values $w_i$, not a formula.}
+\tcblower
+\egline{Solve on $[a,b]=[1,2]$ with $n=2$ steps:}
+\begin{egbody}
+\begin{itemize}
+\item $h=\dfrac{2-1}{2}=0.5$
+\item $t_0=1$, $t_1=1+0.5=1.5$, $t_2=1+2(0.5)=2$
+\item the method produces $w_0,w_1,w_2\approx y(1),\,y(1.5),\,y(2)$
+\end{itemize}
+\edgesub{Edge case: $h$ must divide the interval evenly.}{On $[0,1]$:}
+\begin{itemize}
+\item $h=0.25$ gives $n=4$ steps \cmark{}
+\item $h=0.3$ gives $n=3.33$ \xmark{}: you can't land exactly on $t=b$
+\item choose $h$ (or $n$) so that $n=\dfrac{b-a}{h}$ is a whole number
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{3.2}{Euler's method}
+\[w_0=\alpha,\qquad w_{i+1}=w_i+h\,f(t_i,w_i)\]
+\meaningline{New value = old value + step $\times$ slope at the old point. You walk along the tangent line.}
+\tcblower
+\egline{$y'=t+y^2$, $y(0)=1$, $h=0.1$:}
+\begin{egbody}
+\begin{itemize}
+\item setup: $f(t,y)=t+y^2$, $t_0=0$, $w_0=1$
+\item slope at the start: $f(0,1)=0+1^2=1$
+\item step: $w_1=w_0+h\,f(t_0,w_0)=1+0.1(1)=1.1$
+\item so $y(0.1)\approx1.1$
+\end{itemize}
+\edgesub{Edge case: zero starting slope.}{$y'=-2ty$, $y(0)=1$: $f(0,1)=0$, so $w_1=w_0=1$. Euler doesn't move on the first step, even though the true curve does.}
+\edgesub{Edge case: $h$ too large}{(stability, good to know). $y'=-20y$, $y(0)=1$ (exact $e^{-20t}\to0$). Euler gives $w_{i+1}=(1-20h)\,w_i$:}
+\begin{itemize}
+\item $h=0.1$: factor $-1$, so $w=-1,\,1,\,-1,\,1,\ldots$ (oscillates forever)
+\item $h=0.15$: factor $-2$, so $w=-2,\,4,\,-8,\,16,\ldots$ (blows up)
+\item fix: use a smaller $h$ (here $h<0.1$)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{3.3}{Local $\to$ global error}
+\[\text{local }O(h^{p+1})\ \Longrightarrow\ \text{global }O(h^{p})\qquad\text{(Euler: local }O(h^2),\ \text{global }O(h))\]
+\meaningline{Local error = error made in \textbf{one} step, if you started that step exactly right; it's the dropped Taylor term. Global error = total error at the end. You take $\frac{b-a}{h}$ steps, so you lose one power of $h$.}
+\tcblower
+\egline{$y'=y$, $y(0)=1$ (exact $y=e^t$). Euler gives $w_1=1+h$:}
+\begin{egbody}
+\begin{itemize}
+\item one step, $h=0.1$: $e^{0.1}-1.1=0.0052$
+\item one step, $h=0.05$: $e^{0.05}-1.05=0.0013$ ($\div$4, so the local error is $O(h^2)$)
+\item to $t=1$, $h=0.1$ (10 steps): $e-1.1^{10}=0.1245$
+\item to $t=1$, $h=0.05$ (20 steps): $e-1.05^{20}=0.0650$ ($\div$2, so the global error is $O(h)$)
+\end{itemize}
+\edgesub{Edge case: zero local error.}{If the true solution is a straight line, $y''=0$ and Euler is \textbf{exact}:}
+\begin{itemize}
+\item $y'=2$, $y(0)=1$ (exact $y=1+2t$)
+\item Euler: $w_{i+1}=w_i+2h$, so $w_i=1+2t_i=y(t_i)$ for any $h$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item ``Order of a method'' = order of the \textbf{global} error. Order $p$ means halving $h$ divides the error by $2^p$.
+\item Derivation moves (all ODE methods): Taylor expand $y$ about $t_i$ $\to$ evaluate at $t_{i+1}$ ($t_{i+1}-t_i=h$) $\to$ use $y'=f$ $\to$ drop $O(h^{\cdot})$ and replace $y$ with $w$.
+\item Systems (SIR): apply Euler to every variable, using the \textbf{old} values on the right-hand side.
+\end{itemize}
+\end{rembox}
+\week{Week 4: Higher-order ODE methods (4 formulas)}
+\begin{formulabox}{4.1}{Second-order Taylor method}
+\[w_{i+1}=w_i+h\,f(t_i,w_i)+\frac{h^2}{2}f'(t_i,w_i)\]
+\meaningline{Euler plus a curvature correction (the next Taylor term). Global $O(h^2)$.}
+\tcblower
+\egline{$y'=y-t$, $y(0)=2$, $h=0.2$:}
+\begin{egbody}
+\begin{itemize}
+\item $f(t,y)=y-t$, so $f(0,2)=2$
+\item $f'(t,y)=y'-1=(y-t)-1$, so $f'(0,2)=1$
+\item $w_1=2+0.2(2)+\dfrac{0.2^2}{2}(1)=2+0.4+0.02=2.42$
+\item exact $y(0.2)=2.4214$
+\end{itemize}
+\edgesub{Edge case: exact for quadratic solutions.}{$y'=2t$, $y(0)=0$ (exact $y=t^2$):}
+\begin{itemize}
+\item $f=2t$ and $f'=2$
+\item $w_1=0+h(0)+\dfrac{h^2}{2}(2)=h^2=y(h)$ \cmark{}
+\item exact because the dropped term involves $y'''=0$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{4.2}{Total derivative (for Taylor 2)}
+\[f'(t,y)=\frac{\partial f}{\partial t}+\frac{\partial f}{\partial y}\cdot f(t,y)\]
+\meaningline{$y$ depends on $t$, so use the chain rule and replace $y'$ with $f$. This is the most common lost mark and the most common MATLAB bug.}
+\tcblower
+\egline{$f=y-t$:}
+\begin{egbody}
+\begin{itemize}
+\item $\dfrac{\partial f}{\partial t}=-1$ and $\dfrac{\partial f}{\partial y}=1$
+\item $f'=-1+1\cdot f=-1+(y-t)=y-t-1$
+\end{itemize}
+\egsub{Another: $f=4t+y^2$ (this was a 2023 Q4 bug):}
+\begin{itemize}
+\item $\dfrac{\partial f}{\partial t}=4$ and $\dfrac{\partial f}{\partial y}=2y$
+\item $f'=4+2y\cdot f=4+2y(4t+y^2)$, \textbf{not} $4+2y$
+\end{itemize}
+\edgesub{Edge case: $f$ depends on only one variable.}{}
+\begin{itemize}
+\item only $t$: $f=t^2$ gives $f'=2t$ (no chain-rule term, since $\dfrac{\partial f}{\partial y}=0$)
+\item only $y$: $f=y^2$ gives $f'=0+2y\cdot f=2y\cdot y^2=2y^3$ (only the chain-rule term)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{4.3}{Modified Euler}
+\[k_1=hf(t_i,w_i),\qquad k_2=hf(t_i+h,\ w_i+k_1),\qquad w_{i+1}=w_i+\tfrac12(k_1+k_2)\]
+\meaningline{Do a trial Euler step, measure the slope at the predicted end, then average the start and end slopes. Global $O(h^2)$ with no $f'$ needed.}
+\tcblower
+\egline{$y'=t+y^2$, $y(0)=1$, $h=0.1$:}
+\begin{egbody}
+\begin{itemize}
+\item $k_1=0.1\,f(0,1)=0.1(0+1)=0.1$
+\item predicted end point: $(0+0.1,\ 1+0.1)=(0.1,\ 1.1)$
+\item $k_2=0.1\,f(0.1,1.1)=0.1(0.1+1.21)=0.131$
+\item $w_1=1+\dfrac12(0.1+0.131)=1.1155$
+\end{itemize}
+\edgesub{Edge case: $f$ depends only on $t$.}{Then Modified Euler is exactly the \textbf{trapezoidal rule} (Week 11): $w_{i+1}=w_i+\dfrac h2\big[f(t_i)+f(t_{i+1})\big]$. For $y'=2t$, $y(0)=0$, $h=0.5$:}
+\begin{itemize}
+\item $k_1=0.5(2\times0)=0$
+\item $k_2=0.5(2\times0.5)=0.5$
+\item $w_1=0+\dfrac12(0+0.5)=0.25=y(0.5)$ \cmark{} (the trapezoid is exact for linear $f$)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{4.4}{RK4}
+\[\begin{aligned}k_1&=hf(t_i,w_i), & k_2&=hf\!\left(t_i+\tfrac h2,\ w_i+\tfrac{k_1}2\right)\\ k_3&=hf\!\left(t_i+\tfrac h2,\ w_i+\tfrac{k_2}2\right), & k_4&=hf(t_i+h,\ w_i+k_3)\end{aligned}\]
+\[w_{i+1}=w_i+\tfrac16(k_1+2k_2+2k_3+k_4)\]
+\meaningline{Four slope samples (start, midpoint twice, end) weighted $1:2:2:1$. Global $O(h^4)$. Note that $k_4$ uses the \textbf{full} $k_3$.}
+\tcblower
+\egline{$y'=3t-\frac yt$, $y(1)=2$, $h=0.5$:}
+\begin{egbody}
+\begin{itemize}
+\item $k_1=0.5\,f(1,\ 2)=0.5(3-2)=0.5$
+\item $k_2=0.5\,f(1.25,\ 2.25)=0.5(3.75-1.8)=0.975$
+\item $k_3=0.5\,f(1.25,\ 2.4875)=0.5(3.75-1.99)=0.88$
+\item $k_4=0.5\,f(1.5,\ 2.88)=0.5(4.5-1.92)=1.29$
+\item $w_1=2+\dfrac16\big(0.5+2(0.975)+2(0.88)+1.29\big)=2+\dfrac{5.5}{6}=2.9167$ (exact $2.9167$)
+\end{itemize}
+\edgesub{Edge case: $f$ depends only on $t$.}{Then $k_2=k_3$ and RK4 is exactly \textbf{Simpson's rule}: $w_{i+1}=w_i+\dfrac h6\big[f(t_i)+4f(t_i+\dfrac h2)+f(t_{i+1})\big]$. For $y'=3t^2$, $y(0)=0$, $h=1$:}
+\begin{itemize}
+\item $k_1=3(0)^2=0$
+\item $k_2=k_3=3(0.5)^2=0.75$
+\item $k_4=3(1)^2=3$
+\item $w_1=\dfrac16(0+1.5+1.5+3)=1=y(1)$ \cmark{} (Simpson is exact for cubics)
+\end{itemize}
+\edgesub{Edge case (MATLAB):}{$k_4$ uses the \textbf{full} $k_3$; writing \texttt{w+k3/2} was one of the bugs in 2025 Q4.}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{center}\begin{tabular}{lcc}\toprule
+\textbf{Method} & \textbf{Global order} & \textbf{Needs $f'$?}\\\midrule
+Euler & 1 & no\\
+Taylor 2 & 2 & yes\\
+Modified Euler & 2 & no\\
+RK4 & 4 & no\\
+\bottomrule\end{tabular}\end{center}
+\begin{itemize}
+\item Modified Euler derivation: Taylor 2 + $f'\approx\frac{f(t_{i+1},y_{i+1})-f(t_i,y_i)}{h}$ $\to$ $w_{i+1}=w_i+\frac h2[f_i+f_{i+1}]$ $\to$ replace $w_{i+1}$ on the right-hand side with Euler's $w_i+hf_i$.
+\end{itemize}
+\end{rembox}
+\week{Week 5: Interpolation, Lagrange (2 formulas)}
+\begin{formulabox}{5.1}{Lagrange form}
+\[P_n(x)=\sum_{i=0}^{n}L_{n,i}(x)\,y_i,\qquad L_{n,i}(x)=\prod_{j\ne i}\frac{x-x_j}{x_i-x_j}\]
+\meaningline{$L_{n,i}$ equals 1 at $x_i$ and 0 at every other node. So the sum passes through every data point.}
+\tcblower
+\egline{$f=\log x$, nodes $1,2,4$; estimate $\log3$:}
+\begin{egbody}
+\begin{itemize}
+\item $y$ values: $\log1=0$, $\log2=0.6931$, $\log4=1.3863$
+\item $L_{2,0}(3)=\dfrac{(3-2)(3-4)}{(1-2)(1-4)}=\dfrac{-1}{3}$
+\item $L_{2,1}(3)=\dfrac{(3-1)(3-4)}{(2-1)(2-4)}=\dfrac{-2}{-2}=1$
+\item $L_{2,2}(3)=\dfrac{(3-1)(3-2)}{(4-1)(4-2)}=\dfrac26=\dfrac13$
+\item check: $-\dfrac13+1+\dfrac13=1$ \cmark{}
+\item $P_2(3)=-\dfrac13(0)+1(0.6931)+\dfrac13(1.3863)=1.1552$ (true $1.0986$)
+\end{itemize}
+\edgesub{Edge case: repeated node.}{If $x_i=x_j$, the denominator $(x_i-x_j)=0$, so the nodes must be \textbf{distinct}.}
+\edgesub{Edge case: ``degree at most $n$''.}{$(0,1),(1,3),(2,5)$ lie on a line, so $P_2(x)=1+2x$ (the $x^2$ coefficient is 0). Three points don't always give a genuine quadratic.}
+\edgesub{Edge case: evaluating at a node}{returns the data exactly: $P_2(x_1)=y_1$, because $L_{n,1}(x_1)=1$ and the other basis polynomials are 0 there.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{5.2}{Interpolation remainder}
+\[f(x)-P_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)(x-x_1)\cdots(x-x_n),\qquad c\in[a,b]\]
+\meaningline{Like the Taylor remainder, but $(x-x_0)^{n+1}$ becomes a product over \textbf{all} nodes, so the error is zero at each node.}
+\tcblower
+\egline{Same ($\log x$, nodes $1,2,4$, at $x=3$):}
+\begin{egbody}
+\begin{itemize}
+\item $f'''(x)=\dfrac2{x^3}$ is largest on $[1,4]$ at $c=1$, so $|f'''(c)|\le2$
+\item product: $|(3-1)(3-2)(3-4)|=2$
+\item bound: $|R_2(3)|\le\dfrac{2}{3!}\times2=0.667$
+\item actual error: $|1.1552-1.0986|=0.057\le0.667$ \cmark{}
+\end{itemize}
+\edgesub{Edge case: extrapolation.}{Same nodes $1,2,4$, but now at $x=8$ (outside them):}
+\begin{itemize}
+\item $P_2(8)=0$, while $\log8=2.079$ (error $2.08$)
+\item product: $|(8-1)(8-2)(8-4)|=168$, so the bound is $\dfrac26\times168=56$ (valid, but huge)
+\item outside the nodes, the product grows fast, and so does the error
+\end{itemize}
+\edgesub{Edge case: polynomial data.}{If $f$ is a polynomial of degree $\le n$, then $f^{(n+1)}=0$ and the error is \textbf{exactly 0} (e.g. 3 points from $x^2$).}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item \textbf{Uniqueness:} $n+1$ distinct points give exactly one polynomial of degree $\le n$. Lagrange, divided differences and forward differences all give the \textbf{same} polynomial.
+\item $n+1$ points means degree $n$, which means the bound uses $f^{(n+1)}$.
+\item Check: $\sum_i L_{n,i}(x)=1$.
+\item Relative error in code divides by $|f(a)|$ (the true value).
+\end{itemize}
+\end{rembox}
+\week{Week 6: Newton divided differences (2 formulas)}
+\begin{formulabox}{6.1}{Divided difference}
+\[f[x_i]=y_i,\qquad f[x_i,\dots,x_{i+k}]=\frac{f[x_{i+1},\dots,x_{i+k}]-f[x_i,\dots,x_{i+k-1}]}{x_{i+k}-x_i}\]
+\meaningline{(Drop the first point) minus (drop the last point), divided by (last $x$ minus first $x$). First differences are slopes; second differences are slopes of slopes.}
+\tcblower
+\egline{Data $(-1,3),(0,1),(2,3)$:}
+\begin{egbody}
+\begin{itemize}
+\item $f[-1,0]=\dfrac{1-3}{0-(-1)}=-2$
+\item $f[0,2]=\dfrac{3-1}{2-0}=1$
+\item $f[-1,0,2]=\dfrac{f[0,2]-f[-1,0]}{2-(-1)}=\dfrac{1-(-2)}{3}=1$
+\end{itemize}
+\edgesub{Edge case: order doesn't matter.}{$f[2,0]=\dfrac{y_0-y_2}{0-2}=\dfrac{y_2-y_0}{2-0}=f[0,2]$. Divided differences are symmetric, but always divide by the last minus the first $x$ \textbf{of the same list}.}
+\edgesub{Edge case: a repeated $x$}{gives division by zero, so the nodes must be distinct.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{6.2}{Newton divided difference form}
+\[P_n(x)=f[x_0]+f[x_0,x_1](x-x_0)+f[x_0,x_1,x_2](x-x_0)(x-x_1)+\cdots\]
+\meaningline{The coefficients are the \textbf{top diagonal} of the table. Adding a point adds \textbf{one term}, and the old work is kept.}
+\tcblower
+\egline{Same data. The top diagonal is $3,\ -2,\ 1$:}
+\begin{egbody}
+\begin{itemize}
+\item $P_2(x)=3+(-2)(x+1)+1\cdot(x+1)(x-0)$
+\item expand: $3-2x-2+x^2+x=x^2-x+1$
+\item check: $P_2(2)=4-2+1=3$ \cmark{}
+\end{itemize}
+\edgesub{Edge case: the new point is already on the curve.}{Add $(1,1)$ to the data above (check: $P_2(1)=1-1+1=1$):}
+\begin{itemize}
+\item $f[2,1]=\dfrac{1-3}{1-2}=2$
+\item $f[0,2,1]=\dfrac{2-1}{1-0}=1$
+\item $f[-1,0,2,1]=\dfrac{1-1}{1-(-1)}=0$
+\item the new coefficient is \textbf{0}, so $P_3=P_2$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Nodes can be in any order; always divide by the outermost $x$'s of the span.
+\item Exam: expand $f[x_0,x_1,x_2,x_3]$ by applying 6.1 repeatedly (one level per line).
+\end{itemize}
+\end{rembox}
+\week{Week 7: Newton forward differences (3 formulas)}
+\begin{formulabox}{7.1}{Forward differences}
+\[\Delta y_i=y_{i+1}-y_i,\qquad \Delta^2y_i=y_{i+2}-2y_{i+1}+y_i,\qquad\Delta^3y_i=y_{i+3}-3y_{i+2}+3y_{i+1}-y_i\]
+\meaningline{Plain subtractions down the table, with no division. Use them only for \textbf{equally spaced} data.}
+\tcblower
+\egline{$y=1,2,4,8$ (from $2^x$ at $x=0,1,2,3$):}
+\begin{egbody}
+\begin{itemize}
+\item $\Delta y$: $2-1=1$, $4-2=2$, $8-4=4$
+\item $\Delta^2y$: $2-1=1$, $4-2=2$
+\item $\Delta^3y$: $2-1=1$
+\item top diagonal: $y_0=1$, $\Delta y_0=1$, $\Delta^2y_0=1$, $\Delta^3y_0=1$
+\end{itemize}
+\edgesub{Edge case: polynomial data.}{Degree-$d$ data have constant $\Delta^d$ and zero $\Delta^{d+1}$. For $y=x^2$ at $x=0,1,2,3$:}
+\begin{itemize}
+\item $y$: 0, 1, 4, 9
+\item $\Delta y$: 1, 3, 5
+\item $\Delta^2y$: 2, 2 (constant)
+\item $\Delta^3y$: 0
+\end{itemize}
+\edgesub{Edge case: unequal spacing}{(e.g. $x=0,1,3$): forward differences don't apply, so use divided differences instead.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{7.2}{Newton forward difference form}
+\[P_n(x)=\sum_{k=0}^{n}\binom sk\Delta^ky_0=y_0+s\Delta y_0+\frac{s(s-1)}{2!}\Delta^2y_0+\frac{s(s-1)(s-2)}{3!}\Delta^3y_0+\cdots,\qquad s=\frac{x-x_0}{h}\]
+\meaningline{The coefficients are the top diagonal of the difference table. \textbf{Convert $x\to s$ before evaluating.}}
+\tcblower
+\egline{Same data, $h=1$, so $s=\frac{x-0}{1}=x$:}
+\begin{egbody}
+\begin{itemize}
+\item $P_3=1+1\cdot s+\dfrac{s(s-1)}{2}(1)+\dfrac{s(s-1)(s-2)}{6}(1)$
+\item to estimate $2^{0.5}$: $x=0.5$, so $s=0.5$
+\item terms: $1+0.5+\dfrac{(0.5)(-0.5)}{2}+\dfrac{(0.5)(-0.5)(-1.5)}{6}=1+0.5-0.125+0.0625$
+\item $P_3=1.4375$ (true $\sqrt2=1.4142$)
+\end{itemize}
+\edgesub{Edge case: $s$ outside $[0,n]$ means extrapolation.}{For the population data 1970–2010 ($s=0,\dots,4$), 1950 is $s=-2$, which gives $P_4=3217$: more than in 1970, so unrealistic.}
+\edgesub{Edge case: $x_0$ must be the first node.}{$s$ is measured from $x_0$, and the top diagonal belongs to $x_0$.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{7.3}{Link to divided differences}
+\[f[x_0,x_1,\dots,x_k]=\frac{\Delta^ky_0}{k!\,h^k}\]
+\meaningline{With equal spacing, divided differences become forward differences scaled by $k!\,h^k$. Proving it for $k=2$ is an exam question.}
+\tcblower
+\egline{$(1,1),(2,4),(3,9)$ from $y=x^2$, with $h=1$:}
+\begin{egbody}
+\begin{itemize}
+\item $\Delta^2y_0=y_2-2y_1+y_0=9-8+1=2$
+\item $f[x_0,x_1,x_2]=\dfrac{2}{2!\cdot1^2}=1$
+\item check: $f[1,2]=3$, $f[2,3]=5$, $f[1,2,3]=\dfrac{5-3}{3-1}=1$ \cmark{} (the $x^2$ coefficient)
+\end{itemize}
+\edgesub{Edge case: don't forget $h^k$ when $h\ne1$.}{For $(0,0),(0.5,0.25),(1,1)$ from $y=x^2$, $h=0.5$:}
+\begin{itemize}
+\item $\Delta^2y_0=1-2(0.25)+0=0.5$
+\item $f[x_0,x_1,x_2]=\dfrac{0.5}{2!\times0.5^2}=1$ \cmark{}
+\item forgetting $h^2$ gives $\dfrac{0.5}{2}=0.25$ \xmark{}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Interpolation (inside the data) is reliable. \textbf{Extrapolation} (outside) is unreliable.
+\item $\binom sk=\frac{s(s-1)\cdots(s-k+1)}{k!}$ works for non-integer $s$.
+\end{itemize}
+\end{rembox}
+\week{Week 8: Bisection \& fixed point (4 formulas)}
+\begin{formulabox}{8.1}{Bracketing condition (from the IVT)}
+\[f\text{ continuous on }[a,b]\ \text{and}\ f(a)\,f(b)<0\ \Longrightarrow\ \text{a root in }[a,b]\]
+\meaningline{If the function changes sign, it must cross zero. Write: ``opposite signs, so $[a,b]$ is a bracketing''.}
+\tcblower
+\egline{$f(x)=x^3-2x-7$ on $[1,3]$ (2025 Q9a):}
+\begin{egbody}
+\begin{itemize}
+\item $f(1)=1-2-7=-8<0$
+\item $f(3)=27-6-7=14>0$
+\item opposite signs and $f$ is continuous, so $[1,3]$ is a bracketing
+\end{itemize}
+\edgesub{Edge case: sign change but no root.}{$f(x)=\dfrac1x$ on $[-1,1]$: $f(-1)=-1$ and $f(1)=1$, but there's no root, because $f$ jumps at $x=0$. The IVT needs $f$ to be \textbf{continuous}.}
+\edgesub{Edge case: no sign change, yet roots exist.}{$f(x)=x^2-0.25$ on $[-1,1]$: $f(\pm1)=0.75$, both positive, but there are roots at $\pm0.5$ (two crossings cancel out).}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{8.2}{Bisection}
+\[p=\frac{a+b}{2};\quad\text{if }\operatorname{sign}f(p)=\operatorname{sign}f(a)\text{ then }a\leftarrow p\text{, else }b\leftarrow p;\qquad|p_n-\text{root}|\le\frac{b-a}{2^n}\]
+\meaningline{Keep the half that still has the sign change. The approximation after $n$ iterations is the $n$th midpoint. Guaranteed, but slow.}
+\tcblower
+\egline{Same $f$, two iterations on $[1,3]$:}
+\begin{egbody}
+\begin{itemize}
+\item iteration 1: $p=\dfrac{1+3}2=2$, $f(2)=-3$ (same sign as $f(a)$), so $a\leftarrow2$, giving $[2,3]$
+\item iteration 2: $p=\dfrac{2+3}2=2.5$, $f(2.5)=3.625$ (same sign as $f(b)$), so $b\leftarrow2.5$, giving $[2,2.5]$
+\item estimate after 2 iterations: $2.5$, with error $\le\dfrac{3-1}{2^2}=0.5$
+\end{itemize}
+\edgesub{Edge case: $f(p)=0$ exactly.}{Stop: $p$ is the root.}
+\edgesub{Edge case: how many iterations?}{For error $\le10^{-3}$ on $[1,3]$:}
+\begin{itemize}
+\item you need $\dfrac{2}{2^n}\le10^{-3}$, i.e. $2^n\ge2000$
+\item so $n=11$ iterations
+\end{itemize}
+\edgesub{Edge case: several roots in $[a,b]$.}{Bisection finds \textbf{one} of them, and you can't choose which.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{8.3}{Fixed point iteration}
+\[x=g(x),\qquad x_{n+1}=g(x_n)\]
+\meaningline{Rewrite $f(x)=0$ as $x=g(x)$ and feed each output back in. The answer is where $y=g(x)$ meets $y=x$.}
+\tcblower
+\egline{Solve $x=\cos x$ with $g(x)=\cos x$, $x_0=0.5$:}
+\begin{egbody}
+\begin{itemize}
+\item $x_1=\cos0.5=0.8776$
+\item $x_2=\cos0.8776=0.6390$
+\item $x_3=\cos0.6390=0.8027$
+\item \ldots{}it zig-zags slowly in to $0.7391$
+\end{itemize}
+\edgesub{Edge case: same equation, different $g$, opposite outcome.}{For $0.9\cos x=\sqrt x$ (lecture), from $x_0=0.5$:}
+\begin{itemize}
+\item $g_1(x)=\cos^{-1}\!\left(\dfrac{\sqrt x}{0.9}\right)$: $0.667,\ 0.444,\ 0.750,\ 0.276,\ 0.948$, then undefined \xmark{}
+\item $g_2(x)=0.81\cos^2x$: $0.624,\ 0.534,\ 0.600,\ \ldots\to0.57$ \cmark{}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{8.4}{Fixed point theorem (convergence)}
+\[g(x)\in[a,b]\ \forall x\in[a,b]\quad\text{and}\quad|g'(x)|\le k<1\ \Longrightarrow\ \text{unique fixed point, converges for any }x_0\in[a,b]\]
+\meaningline{$g$ must map the interval into itself and \textbf{shrink} distances. If $|g'|>1$ near the root, try another rearrangement.}
+\tcblower
+\egline{$g(x)=\cos x$ on $[0,1]$:}
+\begin{egbody}
+\begin{itemize}
+\item maps into itself: $\cos1=0.54\le g(x)\le1$, so $g(x)\in[0,1]$ \cmark{}
+\item shrinks distances: $|g'(x)|=|\sin x|\le\sin1=0.84<1$ \cmark{}
+\item so the iteration converges for any $x_0\in[0,1]$
+\end{itemize}
+\edgesub{Edge case: the theorem is sufficient, not necessary.}{Take $g=\cos x$ on $[0,2]$:}
+\begin{itemize}
+\item $g(2)=\cos2=-0.42\notin[0,2]$, and $|g'(\dfrac\pi2)|=1$, which is not $<1$
+\item so the theorem \textbf{doesn't apply}, yet the iteration still converges to $0.7391$
+\item failing the test means ``no guarantee'', not ``will diverge''
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\week{Week 9: Newton \& secant (2 formulas + orders)}
+\begin{formulabox}{9.1}{Newton's method}
+\[x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}\]
+\meaningline{Follow the tangent line at $x_n$ down to the $x$-axis. Derivation: set $0=f(x_n)+f'(x_n)(x_{n+1}-x_n)$.}
+\tcblower
+\egline{$f(x)=x^3-2x-7$, $x_0=2$ (2025 Q9c):}
+\begin{egbody}
+\begin{itemize}
+\item $f(2)=8-4-7=-3$
+\item $f'(x)=3x^2-2$, so $f'(2)=10$
+\item $x_1=2-\dfrac{-3}{10}=2.3$
+\end{itemize}
+\edgesub{Edge case: $f'(x_n)=0$.}{For $f=x^2-2$ with $x_0=0$: $f'(0)=0$, so you'd divide by zero (the tangent is horizontal and never meets the axis).}
+\edgesub{Edge case: cycling.}{For $f=x^3-2x+2$ with $x_0=0$:}
+\begin{itemize}
+\item $x_1=0-\dfrac{f(0)}{f'(0)}=0-\dfrac{2}{-2}=1$
+\item $x_2=1-\dfrac{f(1)}{f'(1)}=1-\dfrac{1}{1}=0$
+\item back to the start, so it cycles $0,1,0,1,\ldots$ forever; try another $x_0$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{9.2}{Secant method}
+\[x_{n+1}=x_n-f(x_n)\,\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}\]
+\meaningline{Newton with $f'$ replaced by the slope through the last two points. It needs 2 starting values and no derivative.}
+\tcblower
+\egline{$f(x)=x^4-4x^3+2x+3$, $x_0=1$, $x_1=2$ (2024 Q9c):}
+\begin{egbody}
+\begin{itemize}
+\item $f(1)=1-4+2+3=2$
+\item $f(2)=16-32+4+3=-9$
+\item $x_2=2-(-9)\cdot\dfrac{2-1}{-9-2}=2-\dfrac{9}{11}=\dfrac{13}{11}=1.1818$
+\end{itemize}
+\edgesub{Edge case: $f(x_n)=f(x_{n-1})$.}{For $f=x^2-2$ with $x_0=-1$, $x_1=1$: $f(-1)=f(1)=-1$, so the secant line is horizontal and you'd divide by zero.}
+\edgesub{Edge case: no bracket needed, so no guarantee.}{Unlike bisection, the secant iterates can leave the starting interval.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{9.3}{Convergence orders}
+\[|x_{n+1}-p|\approx\lambda|x_n-p|^{r}:\quad r=1\ (\text{bisection, fixed point}),\quad r=\tfrac{1+\sqrt5}{2}\approx1.618\ (\text{secant}),\quad r=2\ (\text{Newton})\]
+\meaningline{$r=2$ means the number of correct digits roughly \textbf{doubles} each step. Secant is slower because it approximates the derivative.}
+\tcblower
+\egline{Newton on $x-\cos x=0$ from $x_0=0.5$ (root $0.739085$):}
+\begin{egbody}
+\begin{itemize}
+\item $x_1=0.755222$: error $1.6\times10^{-2}$
+\item $x_2=0.739142$: error $5.7\times10^{-5}$
+\item $x_3=0.739085$: error $7\times10^{-10}$
+\item the error is roughly squared each step, so the correct digits double
+\end{itemize}
+\edgesub{Edge case: a repeated root slows Newton down.}{For $f=x^2$ (double root at 0) from $x_0=1$:}
+\begin{itemize}
+\item $x_{n+1}=x_n-\dfrac{x_n^2}{2x_n}=\dfrac{x_n}{2}$, giving $0.5,\ 0.25,\ 0.125,\ \ldots$
+\item the error only \textbf{halves} each step, so convergence is linear, not quadratic
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Deriving an iteration for $\sqrt[k]a$: choose $f(x)=x^k-a$, apply Newton or secant, simplify.
+\item For secant, use the identities $p^2-q^2=(p-q)(p+q)$ and $p^3-q^3=(p-q)(p^2+pq+q^2)$.
+\item Heron: $x_{n+1}=\frac12\left(x_n+\frac a{x_n}\right)$ is Newton on $x^2-a$.
+\item In code: \texttt{while} uses \texttt{> tol} (keep going), and \texttt{if \ldots{} break} uses \texttt{<= tol} (stop).
+\end{itemize}
+\end{rembox}
+\week{Week 10: Numerical differentiation (5 formulas)}
+\begin{formulabox}{10.1}{Forward difference \normalfont\small (1st order)}
+\[f'(x_0)=\frac{f(x_0+h)-f(x_0)}{h}-\frac h2f''(c)\]
+\meaningline{Slope to the point on the right. Use it at the \textbf{left end} of a table.}
+\tcblower
+\egline{Table $x$: 0.15, 0.3, 0.45; $f$: 1.3516, 1.3043, 1.2419 (2025 Q12a):}
+\begin{egbody}
+\begin{itemize}
+\item $x_0=0.15$ is the left end, so use forward with $h=0.15$
+\item $f'(0.15)\approx\dfrac{f(0.3)-f(0.15)}{0.15}=\dfrac{1.3043-1.3516}{0.15}=\dfrac{-0.0473}{0.15}=-0.3153$
+\end{itemize}
+\edgesub{Edge case: exact for straight lines.}{For $f=3x+1$: $\dfrac{f(x_0+h)-f(x_0)}{h}=\dfrac{3h}{h}=3$ for \textbf{any} $h$ (the error term has $f''=0$).}
+\edgesub{Edge case: $h$ too small.}{Below about $h\approx10^{-8}$, roundoff (catastrophic cancellation) takes over, so a smaller $h$ is \textbf{not} always better.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{10.2}{Backward difference \normalfont\small (1st order)}
+\[f'(x_0)=\frac{f(x_0)-f(x_0-h)}{h}+\frac h2f''(c)\]
+\meaningline{Slope to the point on the left. Use it at the \textbf{right end} of a table.}
+\tcblower
+\egline{Table $x$: 1, 1.1, 1.2; $f$: 0.5679, 0.6542, 0.7286 (2023 Q12a):}
+\begin{egbody}
+\begin{itemize}
+\item $x_0=1.2$ is the right end, so use backward with $h=0.1$
+\item $f'(1.2)\approx\dfrac{0.7286-0.6542}{0.1}=\dfrac{0.0744}{0.1}=0.7440$
+\end{itemize}
+\edgesub{Edge case: opposite error signs.}{The backward error ($+\dfrac h2f''$) and the forward error ($-\dfrac h2f''$) have opposite signs, so their \textbf{average is exactly the central difference}. For $\sin x$ at $x_0=1$, $h=0.1$:}
+\begin{itemize}
+\item forward $0.4970$, backward $0.5820$
+\item average $0.5395$ = central difference (true $0.5403$)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{10.3}{Central difference for $f'$ \normalfont\small (2nd order)}
+\[f'(x_0)=\frac{f(x_0+h)-f(x_0-h)}{2h}-\frac{h^2}{6}f'''(c)\]
+\meaningline{Slope across both neighbours. More accurate, but needs a point on each side.}
+\tcblower
+\egline{Same table; find $f'(1.1)$ (2023 Q12b):}
+\begin{egbody}
+\begin{itemize}
+\item $x_0=1.1$ has neighbours on both sides, so use central with $h=0.1$
+\item $f'(1.1)\approx\dfrac{f(1.2)-f(1.0)}{2(0.1)}=\dfrac{0.7286-0.5679}{0.2}=0.8035$
+\end{itemize}
+\edgesub{Edge case: exact for quadratics}{(the error term has $f'''=0$). For $f=x^2$, $x_0=1$, $h=0.5$:}
+\begin{itemize}
+\item central: $\dfrac{1.5^2-0.5^2}{2(0.5)}=\dfrac{2}{1}=2=f'(1)$ \cmark{}
+\item forward: $\dfrac{1.5^2-1}{0.5}=2.5$ \xmark{}
+\end{itemize}
+\edgesub{Edge case: unequal spacing.}{If the points on either side are at different distances from $x_0$, this formula doesn't apply.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{10.4}{Central difference for $f''$ \normalfont\small (2nd order)}
+\[f''(x_0)=\frac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}-\frac{h^2}{12}f^{(4)}(c)\]
+\meaningline{The ``slope of slopes''. Derivation: \textbf{add} the degree-3 Taylor expansions at $x_0\pm h$, then merge the two $c$'s with the IVT.}
+\tcblower
+\egline{First table ($x$: 0.15, 0.3, 0.45); find $f''(0.3)$ (2025 Q12b):}
+\begin{egbody}
+\begin{itemize}
+\item $h=0.15$, so $h^2=0.0225$
+\item numerator: $1.3516-2(1.3043)+1.2419=-0.0151$
+\item $f''(0.3)\approx\dfrac{-0.0151}{0.0225}=-0.6711$
+\end{itemize}
+\edgesub{Edge case: exact for cubics}{(the error term has $f^{(4)}=0$). For $f=x^3$, $x_0=1$, $h=0.5$:}
+\begin{itemize}
+\item $\dfrac{0.5^3-2(1)+1.5^3}{0.5^2}=\dfrac{0.125-2+3.375}{0.25}=6=f''(1)$ \cmark{}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{10.5}{Second-order forward difference}
+\[f'(x_0)\approx\frac{-3f(x_0)+4f(x_0+h)-f(x_0+2h)}{2h}\]
+\meaningline{Second-order accuracy using only points to the right. Derivation: $4f(x_0+h)-f(x_0+2h)$ cancels the $h^2$ terms.}
+\tcblower
+\egline{$f(x)=\log x$, $x_0=2$, $h=0.1$ (exact $f'(2)=0.5$):}
+\begin{egbody}
+\begin{itemize}
+\item values: $f(2)=0.693147$, $f(2.1)=0.741937$, $f(2.2)=0.788457$
+\item second-order forward: $\dfrac{-3(0.693147)+4(0.741937)-0.788457}{0.2}=0.49925$
+\item plain forward: $\dfrac{0.741937-0.693147}{0.1}=0.4879$ (an error about 16$\times$ bigger)
+\end{itemize}
+\edgesub{Edge case: exact for quadratics.}{For $f=x^2$, $x_0=1$, $h=0.5$:}
+\begin{itemize}
+\item $\dfrac{-3(1)+4(1.5^2)-2^2}{2(0.5)}=\dfrac{-3+9-4}{1}=2=f'(1)$ \cmark{}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Derivations: \textbf{subtract} the expansions to get $f'$ (even terms cancel); \textbf{add} them to get $f''$ (odd terms cancel).
+\item Choosing $h$: too large gives \textbf{truncation} error; too small gives \textbf{roundoff} error (catastrophic cancellation).
+\end{itemize}
+\end{rembox}
+\week{Week 11: Numerical integration (4 formulas)}
+\begin{formulabox}{11.1}{Trapezoidal rule (one strip)}
+\[\int_{x_0}^{x_1}f\,dx\approx\frac h2\big[f(x_0)+f(x_1)\big]\]
+\meaningline{The area of the trapezoid under the straight line (the degree-1 interpolant).}
+\tcblower
+\egline{$\int_1^2\frac1x\,dx$ with one strip ($h=1$):}
+\begin{egbody}
+\begin{itemize}
+\item $f(1)=1$ and $f(2)=0.5$
+\item $\dfrac12\big[1+0.5\big]=0.75$
+\item exact $\log2=0.6931$: one straight line is crude
+\end{itemize}
+\edgesub{Edge case: convex vs concave.}{For one strip, the error is $-\dfrac{h^3}{12}f''(c)$:}
+\begin{itemize}
+\item convex ($f''>0$), e.g. $\dfrac1x$: the trapezoid \textbf{over}-estimates ($0.75>0.6931$)
+\item concave ($f''<0$), e.g. $\sin x$ on $[0,\pi]$: it \textbf{under}-estimates ($1.8961<2$)
+\item straight line ($f''=0$): \textbf{exact}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{11.2}{Composite trapezoidal rule}
+\[\int_a^bf\,dx=\frac h2\Big[f(x_0)+2\sum_{i=1}^{n-1}f(x_i)+f(x_n)\Big]-\frac{(b-a)h^2}{12}f''(c)\]
+\meaningline{Weights $1,2,2,\dots,2,1$. Second order, and exact for polynomials of degree $\le1$.}
+\tcblower
+\egline{Same integral, $n=4$, $h=0.25$:}
+\begin{egbody}
+\begin{itemize}
+\item $x$: 1, 1.25, 1.5, 1.75, 2
+\item $f$: 1, 0.8, 0.6667, 0.5714, 0.5
+\item bracket: $1+2(0.8+0.6667+0.5714)+0.5=5.5762$
+\item $\dfrac{0.25}{2}\times5.5762=0.6970$ (error $0.004$)
+\end{itemize}
+\edgesub{Edge case: $n$ counts strips, not points.}{5 points means $n=4$ and $h=\dfrac{b-a}{4}$; using $n=5$ is a classic slip.}
+\edgesub{Edge case: unequal spacing.}{The formula needs a single $h$; otherwise add up the individual trapezoids yourself.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{11.3}{Simpson's rule (one pair of strips)}
+\[\int_{x_0}^{x_2}f\,dx\approx\frac h3\big[f(x_0)+4f(x_1)+f(x_2)\big]\]
+\meaningline{The area under the parabola (the degree-2 interpolant) through 3 points.}
+\tcblower
+\egline{Same integral, one pair of strips ($h=0.5$):}
+\begin{egbody}
+\begin{itemize}
+\item $f(1)=1$, $f(1.5)=\dfrac23$, $f(2)=0.5$
+\item bracket: $1+4\left(\dfrac23\right)+0.5=4.1667$
+\item $\dfrac{0.5}{3}\times4.1667=0.6944$
+\end{itemize}
+\edgesub{Edge case: exact for cubics too, not just quadratics.}{$\int_0^2x^3\,dx=4$, and with $h=1$:}
+\begin{itemize}
+\item $\dfrac13\big[0+4(1)+8\big]=4$ \cmark{} (the error term has $f^{(4)}=0$)
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{11.4}{Composite Simpson's rule ($n$ even)}
+\[\int_a^bf\,dx=\frac h3\Big[f(x_0)+4\!\!\sum_{\text{odd }i}\!\!f(x_i)+2\!\!\!\sum_{\text{even interior }i}\!\!\!f(x_i)+f(x_n)\Big]-\frac{(b-a)h^4}{180}f^{(4)}(c)\]
+\meaningline{Weights $1,4,2,4,\dots,4,1$. Fourth order, and exact for polynomials of degree $\le3$.}
+\tcblower
+\egline{Same integral, $n=4$, $h=0.25$:}
+\begin{egbody}
+\begin{itemize}
+\item weights $1,4,2,4,1$ on $f$ = 1, 0.8, 0.6667, 0.5714, 0.5
+\item bracket: $1+4(0.8+0.5714)+2(0.6667)+0.5=8.3190$
+\item $\dfrac{0.25}{3}\times8.3190=0.6933$ (error $0.0001$, against $0.004$ for the trapezoid)
+\end{itemize}
+\edgesub{Edge case: $n$ must be even.}{}
+\begin{itemize}
+\item 4 points means $n=3$ (odd), so Simpson can't be used; use the trapezoidal rule instead
+\item 6 points means $n=5$: same problem
+\end{itemize}
+\edgesub{Edge case (MATLAB):}{\texttt{x(i)} is $x_{i-1}$, so the \textbf{even} MATLAB indices \texttt{x(2)}, \texttt{x(4)}, \ldots{} are the odd abscissas and get weight \textbf{4}.}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Derivations: integrate the Newton forward difference interpolant with $x=x_0+sh$, $dx=h\,ds$, $s$ from $0$ to $1$ (trapezoid) or $0$ to $2$ (Simpson).
+\item In MATLAB, $n$ subintervals means $n+1$ points: \texttt{x(1)} is $x_0$ and \texttt{x(n+1)} is $x_n$.
+\end{itemize}
+\end{rembox}
+\week{Week 12: Linear systems \& LU (4 formulas)}
+\begin{formulabox}{12.1}{Forward substitution \normalfont\small (lower triangular)}
+\[x_i=\frac{b_i-\sum_{j<i}a_{ij}x_j}{a_{ii}},\qquad i=1,2,\dots,n\]
+\meaningline{Row 1 gives $x_1$ directly. Substitute it into row 2 to get $x_2$, and so on \textbf{downwards}.}
+\tcblower
+\egline{Solve (2025 Q15a):}
+\begin{egbody}
+\[\begin{bmatrix}3&0\\-2&5\end{bmatrix}\mathbf x=\begin{bmatrix}12\\-23\end{bmatrix}\]
+\begin{itemize}
+\item row 1: $3x_1=12$, so $x_1=4$
+\item row 2: $-2(4)+5x_2=-23$, so $5x_2=-15$ and $x_2=-3$
+\end{itemize}
+\edgesub{Edge case: zero on the diagonal.}{In the system below, row 1 says $0\cdot x_1=1$, which is impossible:}
+\[\begin{bmatrix}0&0\\1&2\end{bmatrix}\mathbf x=\begin{bmatrix}1\\3\end{bmatrix}\]
+\begin{itemize}
+\item a triangular system has a unique solution only if \textbf{every diagonal entry is nonzero}
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{12.2}{Backward substitution \normalfont\small (upper triangular)}
+\[x_i=\frac{b_i-\sum_{j>i}a_{ij}x_j}{a_{ii}},\qquad i=n,\dots,1\]
+\meaningline{The last row gives $x_n$ directly. Work \textbf{upwards}.}
+\tcblower
+\egline{Solve:}
+\begin{egbody}
+\[\begin{bmatrix}2&1\\0&4\end{bmatrix}\mathbf x=\begin{bmatrix}5\\8\end{bmatrix}\]
+\begin{itemize}
+\item last row: $4x_2=8$, so $x_2=2$
+\item row 1: $2x_1+1(2)=5$, so $x_1=1.5$
+\end{itemize}
+\edgesub{Edge case: zero diagonal entry, infinitely many solutions.}{}
+\[\begin{bmatrix}1&1\\0&0\end{bmatrix}\mathbf x=\begin{bmatrix}2\\0\end{bmatrix}\]
+\begin{itemize}
+\item row 2 says $0=0$ (no information), so $x_2$ is free
+\item row 1 gives $x_1=2-x_2$, which works for every choice of $x_2$
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{12.3}{Solving with LU}
+\[A=LU:\qquad L\mathbf z=\mathbf b\ (\text{forward}),\quad\text{then}\quad U\mathbf x=\mathbf z\ (\text{backward})\]
+\meaningline{Factorise once (the expensive part), then each new $\mathbf b$ costs only two cheap triangular solves.}
+\tcblower
+\egline{2024 Q15b: $\mathbf z=[2,-8,-4]^T$ is given, so solve $U\mathbf x=\mathbf z$ with}
+\begin{egbody}
+\[U=\begin{bmatrix}2&1&-4\\0&-3&2\\0&0&4\end{bmatrix}\]
+\begin{itemize}
+\item row 3: $4x_3=-4$, so $x_3=-1$
+\item row 2: $-3x_2+2(-1)=-8$, so $x_2=2$
+\item row 1: $2x_1+2-4(-1)=2$, so $x_1=-2$
+\item $\mathbf x=[-2,\ 2,\ -1]^T$
+\end{itemize}
+\edgesub{Edge case: a new right-hand side.}{Reuse the \textbf{same} $L$ and $U$, and redo only the two substitutions. Never refactorise for a new $\mathbf b$.}
+\edgesub{Edge case: order matters.}{Solve $L\mathbf z=\mathbf b$ \textbf{first} (forward), then $U\mathbf x=\mathbf z$ (backward). $\mathbf z$ is not the answer.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{12.4}{Doolittle 3$\times$3 \normalfont\small ($L$ has 1s on the diagonal)}
+\[u_{1j}=a_{1j},\quad \ell_{i1}=\frac{a_{i1}}{u_{11}},\quad u_{22}=a_{22}-\ell_{21}u_{12},\quad u_{23}=a_{23}-\ell_{21}u_{13}\]
+\[\ell_{32}=\frac{a_{32}-\ell_{31}u_{12}}{u_{22}},\qquad u_{33}=a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}\]
+\meaningline{All of these come from one rule: $a_{ij}=(\text{row }i\text{ of }L)\cdot(\text{column }j\text{ of }U)$. Order: row of $U$, column of $L$, row of $U$, \ldots{}}
+\tcblower
+\egline{2024 Q15a, with $\ell_{21}=-2$ and $\ell_{31}=3$ given:}
+\begin{egbody}
+\[A=\begin{bmatrix}2&1&-4\\-4&-5&10\\6&6&-10\end{bmatrix},\qquad u_{23}=2\]
+\begin{itemize}
+\item $u_{22}=a_{22}-\ell_{21}u_{12}=-5-(-2)(1)=-3$
+\item $\ell_{32}=\dfrac{a_{32}-\ell_{31}u_{12}}{u_{22}}=\dfrac{6-3(1)}{-3}=-1$
+\item $u_{33}=a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}=-10-3(-4)-(-1)(2)=4$
+\end{itemize}
+\edgesub{Edge case: zero pivot.}{The matrix below is invertible, but $u_{11}=0$, so $\ell_{21}=\dfrac{1}{0}$ and LU (without pivoting) fails:}
+\[A=\begin{bmatrix}0&1\\1&1\end{bmatrix}\]
+\begin{itemize}
+\item swapping the two rows (\textbf{pivoting}) fixes it
+\end{itemize}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item A zero or tiny pivot $u_{jj}$ makes LU unstable, which \textbf{pivoting} (row swaps) fixes (not covered in detail).
+\end{itemize}
+\end{rembox}
+\week{Week 13: SPD \& Cholesky (3 formulas)}
+\begin{formulabox}{13.1}{Symmetric positive definite}
+\[A^T=A\qquad\text{and}\qquad\mathbf x^TA\mathbf x>0\ \ \text{for all }\mathbf x\neq\mathbf0\]
+\meaningline{Show it by expanding $\mathbf x^TA\mathbf x$ and completing the square into a sum of squares. For a 2$\times$2 matrix: $\mathbf x^TA\mathbf x=ax_1^2+2bx_1x_2+cx_2^2$.}
+\tcblower
+\egline{$A=\begin{bmatrix}1&-1\\-1&2\end{bmatrix}$ (2025 Q16a):}
+\begin{egbody}
+\begin{itemize}
+\item $A\mathbf x=\begin{bmatrix}x_1-x_2\\-x_1+2x_2\end{bmatrix}$
+\item $\mathbf x^TA\mathbf x=x_1(x_1-x_2)+x_2(-x_1+2x_2)=x_1^2-2x_1x_2+2x_2^2$
+\item complete the square: $=(x_1-x_2)^2+x_2^2$
+\item this is $>0$ unless $x_1=x_2=0$, so $A$ is positive definite
+\end{itemize}
+\edgesub{Edge case: positive entries don't make a matrix PD.}{For $A=\begin{bmatrix}1&2\\2&1\end{bmatrix}$ and $\mathbf x=(1,-1)$:}
+\begin{itemize}
+\item $\mathbf x^TA\mathbf x=1-4+1=-2<0$, so $A$ is symmetric but \textbf{not} PD
+\end{itemize}
+\edgesub{Edge case: $\ge0$ is not enough.}{$\begin{bmatrix}1&1\\1&1\end{bmatrix}$ gives $\mathbf x^TA\mathbf x=(x_1+x_2)^2$, which is $0$ for $\mathbf x=(1,-1)\neq\mathbf0$. That's positive \textbf{semi}-definite, not PD.}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{13.2}{Cholesky 3$\times$3 \normalfont\small ($A=LL^T$)}
+\[\ell_{11}=\sqrt{a_{11}},\quad\ell_{21}=\frac{a_{21}}{\ell_{11}},\quad\ell_{31}=\frac{a_{31}}{\ell_{11}},\quad\ell_{22}=\sqrt{a_{22}-\ell_{21}^2}\]
+\[\ell_{32}=\frac{a_{32}-\ell_{31}\ell_{21}}{\ell_{22}},\qquad\ell_{33}=\sqrt{a_{33}-\ell_{31}^2-\ell_{32}^2}\]
+\meaningline{Diagonal entry: $\sqrt{\text{entry}-\text{sum of squares so far}}$. Below the diagonal: $(\text{entry}-\text{dot product so far})\div\text{diagonal}$. Work column by column.}
+\tcblower
+\egline{Factorise:}
+\begin{egbody}
+\[A=\begin{bmatrix}16&4&8\\4&5&-4\\8&-4&22\end{bmatrix}\]
+\begin{itemize}
+\item column 1: $\ell_{11}=\sqrt{16}=4$, $\ell_{21}=\dfrac44=1$, $\ell_{31}=\dfrac84=2$
+\item column 2: $\ell_{22}=\sqrt{5-1^2}=2$, $\ell_{32}=\dfrac{-4-(2)(1)}{2}=-3$
+\item column 3: $\ell_{33}=\sqrt{22-2^2-(-3)^2}=\sqrt9=3$
+\end{itemize}
+\edgesub{Edge case: Cholesky fails.}{For $\begin{bmatrix}1&2\\2&1\end{bmatrix}$:}
+\begin{itemize}
+\item $\ell_{11}=1$ and $\ell_{21}=2$
+\item $\ell_{22}=\sqrt{1-4}=\sqrt{-3}$ \xmark{}, so $A$ is not PD; switch to LU
+\end{itemize}
+\edgesub{Edge case: zero under the root.}{For $\begin{bmatrix}1&1\\1&1\end{bmatrix}$: $\ell_{22}=\sqrt{1-1}=0$, and any later entry would divide by it, so $A$ is not PD (it's singular).}
+\end{egbody}
+\end{formulabox}
+\begin{formulabox}{13.3}{Solving with Cholesky}
+\[L\mathbf z=\mathbf b\ (\text{forward}),\quad\text{then}\quad L^T\mathbf x=\mathbf z\ (\text{backward})\]
+\meaningline{Same idea as LU, with $U=L^T$.}
+\tcblower
+\egline{Same $A$ and $L$, with $\mathbf b=[20,17,28]^T$.}
+\begin{egbody}
+\egsub{Forward, $L\mathbf z=\mathbf b$:}
+\begin{itemize}
+\item $4z_1=20$, so $z_1=5$
+\item $z_1+2z_2=17$, so $z_2=6$
+\item $2z_1-3z_2+3z_3=28$, so $z_3=12$
+\end{itemize}
+\egsub{Backward, $L^T\mathbf x=\mathbf z$:}
+\begin{itemize}
+\item $3x_3=12$, so $x_3=4$
+\item $2x_2-3x_3=6$, so $x_2=9$
+\item $4x_1+x_2+2x_3=5$, so $x_1=-3$
+\end{itemize}
+\edgesub{Edge case: the second solve goes bottom-up.}{$L^T$ is \textbf{upper} triangular, so solve $L^T\mathbf x=\mathbf z$ from the last row up (start with $x_3$). Working top-down is a common slip.}
+\end{egbody}
+\end{formulabox}
+\begin{rembox}
+\begin{itemize}
+\item Cholesky needs $A$ \textbf{symmetric and positive definite}. It does about half the work of LU, needs no pivoting, and is always stable.
+\item Cholesky \textbf{succeeds} (every square root has a positive argument) \textbf{$\Leftrightarrow$} $A$ is SPD. A negative under the root means $A$ is not SPD, so switch to LU.
+\end{itemize}
+\end{rembox}
+\week{Exam-day extras}
+\begin{notebox}{``Which is more accurate?''}
+Name the orders: ``(b) is second order, $O(h^2)$, whereas (a) is first order, $O(h)$, so (b) has the smaller error for the same $h$.''
+\end{notebox}
+\begin{notebox}{MATLAB bug checklist (3 questions, 18 marks)}
+Variables initialised? $\cdot$ \texttt{h=(b-a)/n}? $\cdot$ arguments in order \texttt{f(t,w)}? $\cdot$ \texttt{.*} \texttt{./} \texttt{.\^{}} on vectors? $\cdot$ right coefficients ($k_3/2$, \texttt{2*}, $h/2$ vs $h/3$, \texttt{/6})? $\cdot$ indices \texttt{x(1)}\ldots{}\texttt{x(n+1)}? $\cdot$ stop conditions (\texttt{> tol} vs \texttt{<= tol})? $\cdot$ Newton \texttt{f/fdash} not upside down? $\cdot$ relative error divides by \texttt{abs(true)}?
+\end{notebox}
+\end{document}
