@@ -34,6 +34,7 @@ flowchart LR
 | [notes/week12_lu_factorisation.md](notes/week12_lu_factorisation.md) | Forward/backward substitution, LU factorisation | Q15 |
 | [notes/week13_cholesky.md](notes/week13_cholesky.md) | SPD matrices, Cholesky factorisation | Q16 |
 | [notes/formula_sheet.md](notes/formula_sheet.md) · [**PDF**](notes/formula_sheet.pdf) | **Formula sheet**: every formula to memorise, each with a short meaning, a worked example and edge cases (21-page LaTeX PDF for printing) | all |
+| [**notes/cheat_sheet.pdf**](notes/cheat_sheet.pdf) | **Exam cheat sheet**: one A4 sheet, double-sided. Side 1 covers Q1–Q8 (Weeks 1–7), side 2 covers Q9–Q16 (Weeks 8–13) plus the MATLAB bug checklist | the exam |
 | [**notes/derivations.pdf**](notes/derivations.pdf) | **Derivations**: every derivable formula, one numbered step at a time, with the official mark split on exam derivations and ★★★ priority stars (37 pages) | Q1b, Q2, Q5, Q8, Q10, Q11, Q13, Q15, Q16 |
 | [notes/99_exam_playbook.md](notes/99_exam_playbook.md) | Question map, MATLAB bug catalogue, derivations, A4 sheet plan | all |
 
