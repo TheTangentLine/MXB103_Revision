@@ -102,6 +102,7 @@ Each question asks for **3 errors**, worth 1 mark to identify + 1 to fix each. S
 | 2025 | Q14 | writes $\int_0^1$ | $\int_0^2$ (the numbers are correct) |
 | 2024 | Q6a | $y_1=0.5$, $y_2=-1$ | $y_1=\cos\frac\pi6=\frac{\sqrt3}2$, $y_2=\cos\frac\pi2=0$ |
 | 2024 | Q3 | writes $y(0.1)$ | $y(2.1)$ (the numbers are correct) |
+| 2024 | Q3b Mod. Euler | $k_2=0.1f(2.1,\,1-0.1571)$ | $k_2=0.1f(2.1,\,w_0+k_1)=0.1f(2.1,\,1.5)$. The $-0.1571$ is a typo; $k_2=1.00875$ and $w_1=1.754375$ are correct |
 | 2023 | Q6 | fix: `exp(-x).*(5*x)` | `exp(-x).*cos(5*x)` |
 
 ---

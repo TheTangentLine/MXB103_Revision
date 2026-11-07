@@ -1,25 +1,23 @@
-\documentclass[10pt,a4paper]{extarticle}
-\usepackage[a4paper,margin=0.7cm,top=0.6cm,bottom=0.7cm]{geometry}
+\documentclass[8pt,a4paper]{extarticle}
+\usepackage[a4paper,margin=0.45cm,top=0.45cm,bottom=0.5cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{fontspec}
 \usepackage{xcolor}
 \usepackage{multicol}
 \usepackage{enumitem}
-\usepackage{pifont}
 \usepackage{ragged2e}
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{1pt}
-\setlength{\columnsep}{9pt}
+\setlength{\columnsep}{7pt}
 \setlength{\columnseprule}{0.3pt}
-\setlength{\abovedisplayskip}{2pt}\setlength{\belowdisplayskip}{2pt}
-\setlength{\abovedisplayshortskip}{1pt}\setlength{\belowdisplayshortskip}{1pt}
 \setlength{\jot}{1pt}
 
 \definecolor{accent}{HTML}{1D4E89}
 \definecolor{red}{HTML}{B03A2E}
-\definecolor{grn}{HTML}{1E7B3A}
+\definecolor{grn}{HTML}{1E6B34}
+\definecolor{exbg}{HTML}{EEF6F0}
 \definecolor{muted}{HTML}{4A5560}
 
 % topic bar
@@ -27,9 +25,14 @@
 % inline sub-heading
 \newcommand{\sub}[1]{\textbf{\color{accent}#1}}
 \newcommand{\warn}[1]{{\color{red}\textbf{!} #1}}
-\newcommand{\ex}[1]{{\color{grn}#1}}
+% worked example block: light green box, one line per step
+\newenvironment{ex}[1]{\par\vspace{2pt}\noindent\begin{lrbox}{\exbox}\begin{minipage}{\dimexpr\linewidth-2\fboxsep}\RaggedRight\color{grn}\textbf{e.g.} #1\par\setlength{\parskip}{1.5pt}}{\end{minipage}\end{lrbox}\colorbox{exbg}{\usebox{\exbox}}\par\vspace{1pt}}
+\newsavebox{\exbox}
+% derivation: one numbered step per line, with air between them
+\newlist{der}{enumerate}{1}
+\setlist[der]{label=\textbf{\color{accent}\arabic*.},leftmargin=11pt,itemsep=2.5pt,topsep=2pt,parsep=0pt}
 \newlist{tl}{itemize}{2}
-\setlist[tl]{label=\textbullet,leftmargin=7pt,itemsep=0pt,topsep=0pt,parsep=0pt,partopsep=0pt}
+\setlist[tl]{label=\textbullet,leftmargin=7pt,itemsep=0.5pt,topsep=1pt,parsep=0pt,partopsep=0pt}
 
 \begin{document}
 \raggedcolumns
@@ -38,221 +41,351 @@
 \setlength{\abovedisplayskip}{2pt}\setlength{\belowdisplayskip}{2pt}
 \setlength{\abovedisplayshortskip}{1pt}\setlength{\belowdisplayshortskip}{1pt}
 \begin{multicols*}{3}
-{\color{accent}\large\bfseries MXB103 Cheat Sheet} {\color{muted}\scriptsize Side 1: Q1--Q8}\par
-{\scriptsize\color{muted}Calculator in \textbf{RADIANS}; $\log=\ln$. Show working: the formula line usually earns 1 mark.}
+{\color{accent}\large\bfseries MXB103 Cheat Sheet} {\color{muted}\scriptsize Side 1}\par
+{\scriptsize\color{muted}Calculator in \textbf{RADIANS}; $\log=\ln$. Write the general formula first (it usually earns a mark).}
 
 % ===================== WEEK 1 =====================
-\hd{W1 Floating point \hfill Q1}
+\hd{W1 Floating point}
 $F(\beta,k,m,M)$: $\pm d_1.d_2\cdots d_k\times\beta^e$, $d_1\ne0$, $m\le e\le M$ ($k$ counts \emph{all} digits)
 \begin{tl}
 \item $S=\beta^{m}$ \quad $L=(\beta-\beta^{1-k})\beta^{M}$ \quad $u=\tfrac12\beta^{1-k}$
-\item abs $=|x-\tilde x|$, \ rel $=\frac{|x-\tilde x|}{|x|}$ (divide by the \textbf{true} value)
+\item abs $=|x-fl(x)|$, \ rel $=\dfrac{|x-fl(x)|}{|x|}\le u$ (divide by the \textbf{true} value)
 \item dec$\to$bin: integer $\div2$, read remainders \textbf{up}; fraction $\times2$, read integer parts \textbf{down}
-\item $fl(x)$: base $\beta$ $\to$ normalise $\to$ check $e$ $\to$ round to $k$ digits (recheck $e$ if rounding carries)
-\item $|x|<S$: underflow $\to0$;\ \ $|x|>L$: overflow $\to$ Inf. \ IEEE double $F(2,53,-1022,1023)$, $u\approx1.11\times10^{-16}$
+\item $|x|<S$: underflow $\to0$;\ \ $|x|>L$: overflow $\to\infty$
 \end{tl}
-\ex{e.g. $24.25=11000.01_2$;\ $10001.001_2=17.125$;\ $F(2,5,-4,4)$: $S=2^{-4}=0.0625$;\ $F(3,6,\cdot,\cdot)$: $u=\frac12 3^{-5}=0.0021$}
+\sub{How to round $x$ to $fl(x)$:}
+\begin{der}
+\item write $x$ in base $\beta$, normalise to $d_1.d_2\cdots\times\beta^e$
+\item cut after digit $k$: \ $d_1.d_2\cdots d_k\,|\,d_{k+1}\cdots$
+\item look at the \textbf{first dropped digit} $d_{k+1}$:\\ binary: $1\Rightarrow$ round up, $0\Rightarrow$ chop;\\ decimal: $\ge5\Rightarrow$ round up, $\le4\Rightarrow$ chop
+\item round up = add 1 to the last kept digit (carry like normal addition)
+\item if it carries to the front ($1.111|1\to10.000$), renormalise: $1.000\times\beta^{e+1}$
+\item check $m\le e\le M$ \textbf{after} rounding
+\end{der}
+\begin{ex}{$F(2,5,-4,4)$: \ $S=2^{-4}=0.0625$, \ $L=(2-2^{-4})2^4=31$, \ $u=\frac12 2^{-4}=0.03125$}
+$0.1$: $\times2$ gives digits $0.0\,0\,0\,1\,1\,0\,0\,1\,1\ldots$\\
+$0.1=1.1001\,|\,1001\ldots\times2^{-4}$\\
+dropped digit $1\Rightarrow$ round up: $1.1010\times2^{-4}=0.1015625$\\
+rel err $=\frac{0.0015625}{0.1}=0.0156\le u$ \checkmark
+
+$31.5=11111.1_2=1.1111\,|\,1\times2^4$\\
+round up: $10.0000\times2^4=1.0000\times2^5$\\
+$e=5>M=4\Rightarrow$ \textbf{overflow}
+
+$0.05<S=0.0625\Rightarrow$ \textbf{underflow} to 0
+\end{ex}
 
 % ===================== WEEK 2 =====================
-\hd{W2 Cancellation \& Taylor \hfill Q1b, Q2}
-\sub{Cancellation:} subtracting nearly-equal \emph{rounded} numbers. Fix: multiply by the conjugate, or use log/trig rules.
+\hd{W2 Cancellation \& Taylor}
+\sub{Cancellation:} subtracting nearly-equal \emph{rounded} numbers loses digits. Fix: rewrite so there is no subtraction.
 \begin{tl}
-\item $\frac{-b+\sqrt{b^2-4ac}}{2a}=\frac{-2c}{b+\sqrt{b^2-4ac}}$ ($b>0$);\ \ for $b<0$ the other root is $\frac{-2c}{b-\sqrt{\cdot}}$
-\item $1-\cos x=\frac{\sin^2x}{1+\cos x}$;\ $\log(x+1)-\log x=\log(1+\frac1x)$;\ $\sqrt{x+1}-\sqrt x=\frac{1}{\sqrt{x+1}+\sqrt x}$
+\item $\frac{-b+\sqrt{b^2-4ac}}{2a}=\frac{-2c}{b+\sqrt{b^2-4ac}}$ ($b>0$)
+\item $1-\cos x=\frac{\sin^2x}{1+\cos x}$;\ \ $\sqrt{x+1}-\sqrt x=\frac{1}{\sqrt{x+1}+\sqrt x}$
+\item $\log(x+1)-\log x=\log(1+\frac1x)$
 \end{tl}
-\sub{Taylor:} $P_n(x)=\sum_{k=0}^n\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k$
-\[R_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1}\]
-with $c$ between $x_0$ and $x$.
-\sub{Bound:} $|f-P_n|\le\dfrac{\max|f^{(n+1)}|}{(n+1)!}\cdot\max|x-x_0|^{n+1}$
-\begin{tl}
-\item max of $|f^{(n+1)}|$: check the interior too (e.g.\ $|\sin|$ on $[0,\pi]$ is 1)
-\item distance is from $x_0$: \ex{$x_0=\frac\pi6$ on $[0,\frac\pi3]\Rightarrow\frac\pi6$}
-\item marks: form of $R_n$ [1], working [1], number [1]; state where $c$ lies
-\end{tl}
-\ex{$\cos x$, $n=2$, $x_0=0$: $P_2=1-\frac{x^2}2$, $R_2=\frac{\sin c}{6}x^3\le\frac{\sqrt3/2}{6}(\frac\pi3)^3=0.1658$ on $[0,\frac\pi3]$}
+\sub{Taylor polynomial (degree $n$, about $x_0$):}
+\[P_n(x)=\sum_{k=0}^n\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k\]
+\[R_n(x)=f(x)-P_n(x)=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)^{n+1}\]
+($c$ between $x_0$ and $x$)\quad
+\sub{Bound on an interval:} degree $n$ $\Rightarrow$ use derivative $n+1$
+\[|R_n(x)|\le\frac{\max|f^{(n+1)}(c)|}{(n+1)!}\cdot\max|x-x_0|^{n+1}\]
+Take \textbf{both} maxes over the interval (check the interior too).
+\begin{ex}{$f=\sin x$, $x_0=\frac\pi6$, $x\in[0,\frac\pi3]$}
+(a) degree 1 ($n=1$):\\
+$P_1(x)=\sin\frac\pi6+\cos\frac\pi6\,(x-\frac\pi6)=\frac12+\frac{\sqrt3}2(x-\frac\pi6)$\\
+(b) $n+1=2$, so use $f''(x)=-\sin x$:\\
+$R_1(x)=\dfrac{-\sin c}{2!}(x-\frac\pi6)^2$, \ $c$ between $\frac\pi6$ and $x$\\
+$\max|\sin c|$ on $[0,\frac\pi3]$ $=\sin\frac\pi3=\frac{\sqrt3}2$\\
+$\max|x-\frac\pi6|=\frac\pi6$ \ (distance from $x_0$, not from 0)\\
+$|R_1|\le\dfrac{\sqrt3/2}{2}\Big(\dfrac\pi6\Big)^2=\dfrac{\sqrt3\,\pi^2}{144}\approx0.1187$
+\end{ex}
 
 % ===================== WEEKS 3-4 =====================
-\hd{W3--4 ODEs $y'=f(t,y)$, $y(a)=\alpha$ \hfill Q3, Q4, Q5}
-$h=\frac{b-a}{n}$, $t_i=a+ih$, $w_i\approx y_i=y(t_i)$. The output is a \emph{table}, not a formula.
+\hd{W3--4 ODEs $y'=f(t,y)$, $y(a)=\alpha$}
+$h=\frac{b-a}{n}$, $t_i=a+ih$, $w_i\approx y_i=y(t_i)$. Output: a \emph{table} of $(t_i,w_i)$.
 \begin{tl}
 \item \sub{Euler:} $w_{i+1}=w_i+hf(t_i,w_i)$
-\item \sub{Taylor 2:} $w_{i+1}=w_i+hf+\frac{h^2}{2}f'(t_i,w_i)$
-\item \warn{$f'=f_t+f_y\cdot f$} (chain rule: $y$ depends on $t$). \ex{$f=3t-\frac yt\Rightarrow f'=\frac{2y}{t^2}$}
-\item \sub{Mod.\ Euler:} $k_1=hf(t_i,w_i)$, $k_2=hf(t_i+h,w_i+k_1)$, $w_{i+1}=w_i+\frac12(k_1+k_2)$
-\item \sub{RK4:} $k_1=hf(t_i,w_i)$, $k_2=hf(t_i+\frac h2,w_i+\frac{k_1}2)$, $k_3=hf(t_i+\frac h2,w_i+\frac{k_2}2)$, $k_4=hf(t_i+h,w_i+\mathbf{k_3})$; \ $w_{i+1}=w_i+\frac16(k_1+2k_2+2k_3+k_4)$
+\item \sub{Taylor 2:} $w_{i+1}=w_i+hf(t_i,w_i)+\frac{h^2}{2}f'(t_i,w_i)$\\
+\warn{$f'(t,y)=f_t(t,y)+f_y(t,y)\cdot f(t,y)$} (chain rule)
+\item \sub{Mod.\ Euler:} $k_1=hf(t_i,w_i)$, \ $k_2=hf(t_i+h,\,w_i+k_1)$\\ $w_{i+1}=w_i+\frac12(k_1+k_2)$
+\item \sub{RK4:} $k_1=hf(t_i,w_i)$, \ $k_2=hf(t_i+\frac h2,\,w_i+\frac{k_1}2)$\\ $k_3=hf(t_i+\frac h2,\,w_i+\frac{k_2}2)$, \ $k_4=hf(t_i+h,\,w_i+k_3)$\\ $w_{i+1}=w_i+\frac16(k_1+2k_2+2k_3+k_4)$
 \end{tl}
-\begin{center}\scriptsize
-\begin{tabular}{@{}l@{\ }c@{\ }c@{\ }c@{\ }c@{}}
-& Euler & Tay.\,2 & M.\,Euler & RK4\\\hline
+\begin{ex}{$y'=2t-y^2$, $y(0)=1$, $h=0.1$}
+\sub{Euler:} $w_1=1+0.1\,f(0,1)=1+0.1(0-1)=0.9$\\
+$w_2=0.9+0.1\,f(0.1,\,0.9)=0.9+0.1(0.2-0.81)=0.839$
+
+\sub{Taylor 2:} $f_t=2$, $f_y=-2y$\\
+$f'(t,y)=2-2y(2t-y^2)$, \ $f'(0,1)=2-2(1)(-1)=4$\\
+$w_1=1+0.1(-1)+\frac{0.01}{2}(4)=0.92$
+
+\sub{Mod.\ Euler:} $k_1=0.1\,f(0,1)=-0.1$\\
+$k_2=0.1\,f(0.1,\,0.9)=-0.061$\\
+$w_1=1+\frac12(-0.1-0.061)=0.9195$
+
+\sub{RK4:} $k_1=-0.1$, \ $k_2=0.1\,f(0.05,\,0.95)=-0.08025$\\
+$k_3=0.1\,f(0.05,\,0.959875)=-0.082136$\\
+$k_4=0.1\,f(0.1,\,0.917864)=-0.064247$\\
+$w_1=1+\frac16(-0.1-0.1605-0.164272-0.064247)=0.918497$
+\end{ex}
+{\centering\begin{tabular}{@{}l@{\ \ }c@{\ \ }c@{\ \ }c@{\ \ }c@{}}
+& Euler & Taylor 2 & Mod.\,Euler & RK4\\\hline
+local & $O(h^2)$ & $O(h^3)$ & $O(h^3)$ & $O(h^5)$\\
 global & $O(h)$ & $O(h^2)$ & $O(h^2)$ & $O(h^4)$\\
-$f'$? & no & \textbf{yes} & no & no
-\end{tabular}
-\end{center}
-Local $O(h^{p+1})\Rightarrow$ global $O(h^p)$ ($\frac{b-a}{h}$ steps). Halve $h$ $\Rightarrow$ error $\div2^p$.\\
-\sub{Accuracy template:} ``(b) is more accurate: [method] is \textbf{second order} $O(h^2)$, Euler only \textbf{first order} $O(h)$.''
+needs $f'$? & no & \textbf{yes} & no & no
+\end{tabular}\par}
+Local $O(h^{p+1})\times\frac{b-a}{h}$ steps $=$ global $O(h^p)$. \ Halve $h$ $\Rightarrow$ error $\div2^p$. \ {\color{grn}e.g.\ err $0.004\to0.001$ when $h$ halves: $4=2^p$, $p=2$.}\\
+\sub{Accuracy:} ``(b) is more accurate: \textbf{second order} $O(h^2)$ vs Euler's \textbf{first order} $O(h)$.''
 
-\sub{Derive (Q5), 4 moves:} \textbf{1} Taylor $y(t)$ about $t_i$ (degree 1 or 2) \textbf{2} put $t=t_{i+1}$, $t_{i+1}-t_i=h$ \textbf{3} $y'=f$, $y''=f'$ \textbf{4} drop the $O(\cdot)$ term, $y\to w$.
-\[y_{i+1}=y_i+hf_i+\tfrac{h^2}{2}f'_i+O(h^3)\quad\text{(Taylor 2)}\]
-\sub{Mod.\ Euler, extra steps} [0.5 each for moves 1--3, then]:
-\begin{tl}
-\item {[0.5]} $f'(t_i,y_i)=\frac{f(t_{i+1},y_{i+1})-f(t_i,y_i)}{h}+O(h)$
-\item {[1]} substitute: $y_{i+1}=y_i+\frac h2[f(t_i,y_i)+f(t_{i+1},y_{i+1})]+O(h^3)$
-\item {[1]} $w_{i+1}$ is on both sides $\Rightarrow$ inside $f$ use Euler $w_{i+1}\approx w_i+hf(t_i,w_i)$
-\end{tl}
-\begin{align*}w_{i+1}&=w_i+\tfrac h2\big[f(t_i,w_i)\\&\quad+f(t_{i+1},w_i+hf(t_i,w_i))\big]\end{align*}
+\sub{Derive Taylor 2:}
+\begin{der}
+\item Taylor-expand $y(t)$ about $t_i$:\\
+$y(t)=y(t_i)+y'(t_i)(t-t_i)+\frac{y''(t_i)}{2}(t-t_i)^2+\frac{y'''(c)}{6}(t-t_i)^3$
+\item put $t=t_{i+1}$, so $t_{i+1}-t_i=h$:\\
+$y_{i+1}=y_i+hy'(t_i)+\frac{h^2}{2}y''(t_i)+O(h^3)$
+\item use the ODE: $y'(t_i)=f(t_i,y_i)$, \ $y''(t_i)=f'(t_i,y_i)$
+\item drop $O(h^3)$, replace $y\to w$:\\
+$w_{i+1}=w_i+hf(t_i,w_i)+\frac{h^2}{2}f'(t_i,w_i)$
+\end{der}
+\sub{Derive Mod.\ Euler:} steps 1--3 as above, then
+\begin{der}[start=4]
+\item forward difference for $f'$:\\
+$f'(t_i,y_i)=\dfrac{f(t_{i+1},y_{i+1})-f(t_i,y_i)}{h}+O(h)$
+\item substitute into step 2 (the $\frac{h^2}{2}\cdot O(h)$ is $O(h^3)$):\\
+$y_{i+1}=y_i+\frac h2\big[f(t_i,y_i)+f(t_{i+1},y_{i+1})\big]+O(h^3)$
+\item $y_{i+1}$ is on both sides, so inside $f$ use Euler: $y_{i+1}\approx w_i+hf(t_i,w_i)$
+\item result: $w_{i+1}=w_i+\frac h2\big[f(t_i,w_i)+f(t_{i+1},\,w_i+hf(t_i,w_i))\big]$
+\end{der}
 
-\sub{MATLAB (Q4):} \texttt{t}, \texttt{w} initialised to $a,\alpha$? \ \texttt{h=(b-a)/n}? \ \texttt{f(t,w)} not \texttt{f(w,t)}? \ \texttt{fdash} has \texttt{*f(t,y)}? \ RK4: $\frac{k}{2}$, full $k_3$, \texttt{/6}? \ loop \texttt{1:n}? \ \texttt{t=t+h} after the update?
+\sub{MATLAB:} \texttt{t}, \texttt{w} start at $a,\alpha$; \texttt{h=(b-a)/n}; \texttt{f(t,w)} not \texttt{f(w,t)}; \texttt{fdash} has \texttt{*f(t,y)}; RK4 $\frac{k}{2}$, full $k_3$, \texttt{/6}; \texttt{t=t+h} after the update.
 
 % ===================== WEEK 5 =====================
-\hd{W5 Lagrange \hfill Q6}
-$n+1$ distinct points $\Rightarrow$ a \textbf{unique} $P_n$ of degree $\le n$ (all forms give the same one).
-\[P_n=\sum_iL_{n,i}(x)y_i,\quad L_{n,i}=\prod_{j\ne i}\frac{x-x_j}{x_i-x_j}\]
-\begin{align*}P_2&=\tfrac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)}y_0+\tfrac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)}y_1\\&\quad+\tfrac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)}y_2\end{align*}
+\hd{W5 Lagrange}
+$n+1$ distinct points $\Rightarrow$ a \textbf{unique} $P_n$ of degree $\le n$ (Lagrange, Newton DD and Newton FD all give the same polynomial).
+\[P_n(x)=\sum_{i=0}^nL_{n,i}(x)\,y_i,\quad L_{n,i}(x)=\prod_{j\ne i}\frac{x-x_j}{x_i-x_j}\]
 \begin{tl}
-\item $L_{n,i}=1$ at $x_i$, $0$ at the other nodes; \ \textbf{check} $\sum_iL_{n,i}(x)=1$
-\item $f-P_n=\frac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)\cdots(x-x_n)$: bound $=\frac{\max|f^{(n+1)}|}{(n+1)!}\times|\prod|$ (evaluate at the point, or use the max over the interval, usually given)
-\item \sub{MATLAB:} \texttt{.*} on vectors; denominator $L_i$ uses $(x_i-x_j)$, $j\ne i$; \texttt{rel=abs(P-f(a))/abs(f(a))}; \texttt{x(1)} is $x_0$
+\item $L_{n,i}(x_i)=1$, $L_{n,i}(x_j)=0$; \ \textbf{check} $\sum_iL_{n,i}(x)=1$
+\item error: $f(x)-P_n(x)=\dfrac{f^{(n+1)}(c)}{(n+1)!}(x-x_0)(x-x_1)\cdots(x-x_n)$
 \end{tl}
+\begin{ex}{$(1,1),(2,1.414),(3,1.732)$ from $f=\sqrt x$; estimate $\sqrt{1.5}$}
+$L_{2,0}(1.5)=\frac{(1.5-2)(1.5-3)}{(1-2)(1-3)}=\frac{0.75}{2}=0.375$\\
+$L_{2,1}(1.5)=\frac{(1.5-1)(1.5-3)}{(2-1)(2-3)}=\frac{-0.75}{-1}=0.75$\\
+$L_{2,2}(1.5)=\frac{(1.5-1)(1.5-2)}{(3-1)(3-2)}=\frac{-0.25}{2}=-0.125$\\
+check: $0.375+0.75-0.125=1$ \checkmark\\
+$P_2(1.5)=0.375(1)+0.75(1.414)-0.125(1.732)=1.219$
+
+bound: $f'''(x)=\frac38x^{-5/2}$, max on $[1,3]$ at $x=1$: $\frac38$\\
+$|f(1.5)-P_2(1.5)|\le\dfrac{3/8}{3!}\,|(0.5)(-0.5)(-1.5)|=0.0234$
+\end{ex}
+\sub{MATLAB:} \texttt{.*} on vectors; denominator uses $(x_i-x_j)$, $j\ne i$; rel err \texttt{abs(P-f(a))/abs(f(a))}; \texttt{x(1)} is $x_0$.
 
 % ===================== WEEK 6 =====================
-\hd{W6 Divided differences \hfill Q8}
-$f[x_i]=y_i$,\ \ $f[x_i..x_{i+k}]=\dfrac{f[x_{i+1}..x_{i+k}]-f[x_i..x_{i+k-1}]}{x_{i+k}-x_i}$ (last $x$ $-$ first $x$ of the span)
-\begin{align*}P_n&=f[x_0]+f[x_0,x_1](x-x_0)\\&\ +f[x_0,x_1,x_2](x-x_0)(x-x_1)+\cdots\end{align*}
-Coefficients = the \textbf{top diagonal}. Adding a point = 1 row + 1 term.\\
-\sub{Q8 (1 mark/line):} apply the definition repeatedly:
+\hd{W6 Divided differences}
+$f[x_i]=y_i$, \ and (divide by last $x$ $-$ first $x$ of the span):
+\[f[x_i..x_{i+k}]=\frac{f[x_{i+1}..x_{i+k}]-f[x_i..x_{i+k-1}]}{x_{i+k}-x_i}\]
+\[P_n(x)=f[x_0]+\sum_{k=1}^{n}f[x_0,..,x_k]\prod_{j=0}^{k-1}(x-x_j)\]
+\begin{align*}&=f[x_0]+f[x_0,x_1](x-x_0)\\&\quad+f[x_0,x_1,x_2](x-x_0)(x-x_1)+\cdots\end{align*}
+Coefficients = the \textbf{top diagonal}. Adding a point = 1 more row + 1 more term.
+\begin{ex}{$(0,1),(1,3),(3,2)$, estimate $f(2)$}
+{\centering\begin{tabular}{@{}c|c|c|c@{}}
+$x$ & $f[\cdot]$ & $f[\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot]$\\\hline
+0 & \textbf{1} & $\frac{3-1}{1-0}=\mathbf{2}$ & $\frac{-0.5-2}{3-0}=\mathbf{-0.8333}$\\
+1 & 3 & $\frac{2-3}{3-1}=-0.5$ & \\
+3 & 2 & &
+\end{tabular}\par}
+$P_2(x)=1+2(x-0)-0.8333(x-0)(x-1)$\\
+$P_2(2)=1+4-1.6667=3.3333$
+\end{ex}
+\sub{Expand a 3rd-order DD (1 mark/line):}
 \begin{align*}f[x_0..x_3]&=\tfrac{f[x_1,x_2,x_3]-f[x_0,x_1,x_2]}{x_3-x_0}\\
 f[x_1,x_2,x_3]&=\tfrac{f[x_2,x_3]-f[x_1,x_2]}{x_3-x_1}\\
 f[x_0,x_1,x_2]&=\tfrac{f[x_1,x_2]-f[x_0,x_1]}{x_2-x_0}\\
 f[x_i,x_{i+1}]&=\tfrac{y_{i+1}-y_i}{x_{i+1}-x_i}\end{align*}
-then substitute everything into line 1 (4 lines = 4 marks).
+then substitute everything back into line 1.
 
 % ===================== WEEK 7 =====================
-\hd{W7 Forward differences (equal $h$) \hfill Q7, Q8}
-$\Delta y_i=y_{i+1}-y_i$;\ $\Delta^2y_i=y_{i+2}-2y_{i+1}+y_i$;\ $\Delta^3y_i=y_{i+3}-3y_{i+2}+3y_{i+1}-y_i$
-\begin{align*}P_n&=y_0+s\Delta y_0+\tfrac{s(s-1)}{2!}\Delta^2y_0\\&\quad+\tfrac{s(s-1)(s-2)}{3!}\Delta^3y_0,\qquad s=\tfrac{x-x_0}{h}\end{align*}
-\begin{tl}
-\item \warn{convert $x\to s$ first}, then evaluate. Marks: table 1.5, form 0.5, polynomial 0.5, $s$ 0.5, value of $s$ 0.5, answer 0.5
-\item $f[x_0..x_k]=\dfrac{\Delta^ky_0}{k!\,h^k}$. Proof $k=2$: $\dfrac{\frac{y_2-y_1}{h}-\frac{y_1-y_0}{h}}{2h}=\dfrac{y_2-2y_1+y_0}{2h^2}$
-\item inside $[x_0,x_n]$ reliable; \textbf{extrapolation} ($s<0$ or $s>n$) unreliable
-\end{tl}
-\ex{$(0,0),(\frac\pi4,.7071),(\frac\pi2,1)$: $\Delta$: .7071, .2929; $\Delta^2=-.4142$; $s=\frac{4x}{\pi}$; $\sin\frac\pi6\approx P(s{=}\frac23)=0.5174$}
-
-\hd{Common traps, side 1}
-\begin{tl}
-\item Euler uses the slope at the \textbf{start} $(t_i,w_i)$; update $t$ after $w$
-\item one step of Mod.\ Euler: \ex{$y'=3+ty^3$, $y(2)=1$, $h=0.1$: $k_1=0.5$, $k_2=0.1f(2.1,1.5)=1.00875$, $w_1=1.754375$}
-\item Taylor 2 derivative without the chain rule earns \textbf{0}
-\item error bound: use the $(n+1)$th derivative and the distance from $x_0$; state where $c$ lies
-\item Lagrange: nodes distinct; numerator skips its own node; $\sum L=1$
-\item forward differences: equal spacing only; evaluate with $s$, not $x$
-\end{tl}
+\hd{W7 Forward differences (equal $h$)}
+$h=x_1-x_0$ (all gaps equal), \ $s=\dfrac{x-x_0}{h}$\\
+$\Delta y_i=y_{i+1}-y_i$, \ $\Delta^ky_i=\Delta^{k-1}y_{i+1}-\Delta^{k-1}y_i$
+\[P_n(x)=\sum_{k=0}^{n}\binom{s}{k}\Delta^ky_0\]\[\text{where }\binom sk=\frac{s(s-1)\cdots(s-k+1)}{k!},\ \ \binom s0=1\]
+\begin{align*}P_n&=y_0+s\Delta y_0+\frac{s(s-1)}{2!}\Delta^2y_0\\&\quad+\frac{s(s-1)(s-2)}{3!}\Delta^3y_0+\cdots\end{align*}
+$\Delta^2y_0=y_2-2y_1+y_0$, \ $\Delta^3y_0=y_3-3y_2+3y_1-y_0$\\
+Link: $f[x_0,..,x_k]=\dfrac{\Delta^ky_0}{k!\,h^k}$. \ Reliable inside $[x_0,x_n]$; extrapolation ($s<0$ or $s>n$) is not.
+\begin{ex}{same data: $(1,1),(2,1.414),(3,1.732)$, estimate $\sqrt{1.5}$}
+{\centering\begin{tabular}{@{}c|c|c|c@{}}
+$x$ & $y$ & $\Delta y$ & $\Delta^2y$\\\hline
+1 & \textbf{1} & \textbf{0.414} & $\mathbf{-0.096}$\\
+2 & 1.414 & 0.318 & \\
+3 & 1.732 & &
+\end{tabular}\par}
+$\Delta y$: $1.414-1$, \ $1.732-1.414$; \ $\Delta^2y$: $0.318-0.414$\\
+coefficients = the \textbf{top row}\\
+$h=2-1=1$, \ $s=\frac{x-1}{1}=x-1$\\
+$P_2=1+0.414s+\frac{s(s-1)}{2}(-0.096)$\\
+$x=1.5\Rightarrow s=0.5$:\\
+$P_2=1+0.207+\frac{(0.5)(-0.5)}{2}(-0.096)=1.219$ \ (same as W5)
+\end{ex}
 
 \end{multicols*}
 
 % ======================= SIDE 2 =======================
 \newpage
 \begin{multicols*}{3}
-{\color{accent}\large\bfseries MXB103 Cheat Sheet} {\color{muted}\scriptsize Side 2: Q9--Q16}\par
+{\color{accent}\large\bfseries MXB103 Cheat Sheet} {\color{muted}\scriptsize Side 2}\par
 
 % ===================== WEEK 8 =====================
-\hd{W8 Bisection \& fixed point \hfill Q9, Q10}
-\sub{Bracket (2 marks):} ``$f(a)=\dots<0$, $f(b)=\dots>0$: opposite signs and $f$ continuous, so by the IVT $[a,b]$ brackets a root.''
+\hd{W8 Bisection \& fixed point}
+\sub{Bracket (2 marks):} ``$f(a)=\dots<0$, $f(b)=\dots>0$: opposite signs and $f$ continuous, so by the IVT $[a,b]$ contains a root.''
 \begin{tl}
-\item \sub{Bisection:} $p=\frac{a+b}{2}$; if sign $f(p)=$ sign $f(a)$ then $a\leftarrow p$, else $b\leftarrow p$. Estimate after $n$ iterations = the $n$th midpoint; $|p_n-r|\le\frac{b-a}{2^n}$
-\item table columns: iter \,|\, $a$ \,|\, $b$ \,|\, $p$ \,|\, $f(a)$ \,|\, $f(b)$ \,|\, $f(p)$ (signs)
-\item \sub{Fixed point:} $x=g(x)$, $x_{n+1}=g(x_n)$. Converges if $g:[a,b]\to[a,b]$ and $|g'|\le k<1$ (sufficient, not necessary). Linear, rate $\lambda\approx|g'(p)|$
-\item \sub{MATLAB:} \texttt{p=(a+b)/2}; else-branch \texttt{b=p}; \texttt{break} when \texttt{(b-a)<=tol}
+\item \sub{Bisection:} $p=\frac{a+b}{2}$; if $f(p)$ has the sign of $f(a)$ then $a\leftarrow p$, else $b\leftarrow p$. Answer = the latest midpoint; \ $|p_n-r|\le\frac{b-a}{2^n}$
+\item \sub{Fixed point:} rewrite as $x=g(x)$, iterate $x_{n+1}=g(x_n)$. Converges if $g:[a,b]\to[a,b]$ and $|g'(x)|\le k<1$ (sufficient, not necessary). Linear, rate $\approx|g'(p)|$
 \end{tl}
+\begin{ex}{$f(x)=x^2-2$ on $[1,2]$: $f(1)=-1<0$, $f(2)=2>0$}
+{\centering\begin{tabular}{@{}c|c|c|c|c@{}}
+$n$ & $a$ & $b$ & $p$ & $f(p)$\\\hline
+1 & 1 & 2 & 1.5 & $+0.25\Rightarrow b=p$\\
+2 & 1 & 1.5 & 1.25 & $-0.4375\Rightarrow a=p$\\
+3 & 1.25 & 1.5 & 1.375 & $-0.1094\Rightarrow a=p$
+\end{tabular}\par}
+answer after 3 iterations: $1.375$, \ error $\le\frac{1}{2^3}=0.125$
+
+fixed point $x=\cos x$, $x_0=1$:\\
+$x_1=\cos1=0.5403$, \ $x_2=\cos0.5403=0.8576$
+\end{ex}
+\sub{MATLAB:} \texttt{p=(a+b)/2}; else-branch \texttt{b=p}; stop when \texttt{(b-a)<=tol}.
 
 % ===================== WEEK 9 =====================
-\hd{W9 Newton \& secant \hfill Q9, Q10, Q11}
+\hd{W9 Newton \& secant}
 \[\textbf{Newton: }x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}\]
-\textbf{Secant:}
-\[x_{n+1}=x_n-f(x_n)\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}\]
-\sub{Derive Newton [1,1,1]:} tangent $f(x)\approx f(x_n)+f'(x_n)(x-x_n)$; set $0=f(x_n)+f'(x_n)(x_{n+1}-x_n)$; solve.\\
-\sub{Orders:} bisection 1 ($\times\frac12$), fixed point 1, secant $\frac{1+\sqrt5}{2}\approx1.618$, Newton 2 (digits double). Newton fails if $f'(x_n)=0$; it can cycle; it is only linear at a repeated root.\\
-\sub{Q11 recipe:} $f=x^k-a$, apply the method, simplify (use $p^2-q^2=(p-q)(p+q)$, $p^3-q^3=(p-q)(p^2+pq+q^2)$).
+\[\textbf{Secant: }x_{n+1}=x_n-f(x_n)\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}\]
+\begin{ex}{$f(x)=x^2-2$, $f'(x)=2x$}
+Newton, $x_0=1$:\\
+$x_1=1-\frac{-1}{2}=1.5$, \ $x_2=1.5-\frac{0.25}{3}=1.41667$
+
+Secant, $x_0=1$, $x_1=2$:\\
+$x_2=2-2\cdot\frac{2-1}{2-(-1)}=1.3333$\\
+$x_3=1.3333-(-0.2222)\frac{1.3333-2}{-0.2222-2}=1.4$
+\end{ex}
+\sub{Derive Newton (3 marks):}
+\begin{der}
+\item tangent at $x_n$: $f(x)\approx f(x_n)+f'(x_n)(x-x_n)$
+\item the next guess is where the tangent is 0:\\ $0=f(x_n)+f'(x_n)(x_{n+1}-x_n)$
+\item solve: $x_{n+1}=x_n-\dfrac{f(x_n)}{f'(x_n)}$
+\end{der}
+\sub{Orders:} bisection 1, fixed point 1, secant $\frac{1+\sqrt5}{2}\approx1.618$, Newton 2 (correct digits double). Newton fails if $f'(x_n)=0$; only linear at a repeated root.\\
+\sub{Root-finding formula for $\sqrt[k]a$:} $f(x)=x^k-a$, apply the method, simplify (use $p^2-q^2=(p-q)(p+q)$, $p^3-q^3=(p-q)(p^2+pq+q^2)$).
 \begin{tl}
-\item Newton $\sqrt a$: $\frac12(x_n+\frac a{x_n})$ \quad Newton $\sqrt[3]a$: $\frac{2x_n}{3}+\frac{a}{3x_n^2}$
-\item Secant $\sqrt a$: $x_n+\dfrac{a-x_n^2}{x_n+x_{n-1}}$ \quad Secant $\sqrt[3]a$: $x_n-\dfrac{x_n^3-a}{x_n^2+x_nx_{n-1}+x_{n-1}^2}$
-\item \sub{MATLAB:} \texttt{while abs(x-x\_old) > tol}; \texttt{x - f(x)/fdash(x)}; secant: $f(x_1)-f(x_0)$ in the denominator, then shift \texttt{x0=x1; x1=x2}
+\item Newton $\sqrt a$: $x_{n+1}=\frac12(x_n+\frac a{x_n})$; \ $\sqrt[3]a$: $x_{n+1}=\frac{2x_n}{3}+\frac{a}{3x_n^2}$
+\item Secant $\sqrt a$: $x_{n+1}=x_n+\dfrac{a-x_n^2}{x_n+x_{n-1}}$
+\item Secant $\sqrt[3]a$: $x_{n+1}=x_n-\dfrac{x_n^3-a}{x_n^2+x_nx_{n-1}+x_{n-1}^2}$
 \end{tl}
+\sub{MATLAB:} \texttt{while abs(x-x\_old) > tol}; \texttt{x - f(x)/fdash(x)}; secant shifts \texttt{x0=x1; x1=x2}.
 
 % ===================== WEEK 10 =====================
-\hd{W10 Numerical differentiation \hfill Q11, Q12}
+\hd{W10 Numerical differentiation}
 \begin{tl}
-\item fwd (left end): $f'\approx\dfrac{f(x_0+h)-f(x_0)}{h}$, \ error $-\frac h2f''(c)$, $O(h)$
-\item bwd (right end): $f'\approx\dfrac{f(x_0)-f(x_0-h)}{h}$, \ error $+\frac h2f''(c)$, $O(h)$
-\item central (middle): $f'\approx\dfrac{f(x_0+h)-f(x_0-h)}{2h}$, \ error $-\frac{h^2}{6}f'''(c)$, $O(h^2)$
-\item $f''\approx\dfrac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}$, \ error $-\frac{h^2}{12}f^{(4)}(c)$
-\item 2nd-order fwd: $f'\approx\dfrac{-3f(x_0)+4f(x_0+h)-f(x_0+2h)}{2h}$
+\item forward (left end), error $-\frac h2f''(c)$, $O(h)$:
+\[f'(x_0)\approx\frac{f(x_0+h)-f(x_0)}{h}\]
+\item backward (right end), error $+\frac h2f''(c)$, $O(h)$:
+\[f'(x_0)\approx\frac{f(x_0)-f(x_0-h)}{h}\]
+\item central (middle), error $-\frac{h^2}{6}f'''(c)$, $O(h^2)$:
+\[f'(x_0)\approx\frac{f(x_0+h)-f(x_0-h)}{2h}\]
+\item second derivative, error $-\frac{h^2}{12}f^{(4)}(c)$, $O(h^2)$:
+\[f''(x_0)\approx\frac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}\]
+\item 3-point forward, $O(h^2)$:
+\[f'(x_0)\approx\frac{-3f(x_0)+4f(x_0+h)-f(x_0+2h)}{2h}\]
 \end{tl}
-\sub{Derive $f''$ (4 marks):} [1] expand $f(x_0\pm h)=f_0\pm hf_0'+\frac{h^2}2f_0''\pm\frac{h^3}6f_0'''+\frac{h^4}{24}f^{(4)}(c_{1,2})$; [1] \textbf{add} (odd terms cancel); [1] rearrange, $\div h^2$: error $-\frac{h^2}{12}\cdot\frac{f^{(4)}(c_1)+f^{(4)}(c_2)}2$; [1] \textbf{IVT}: the average $=f^{(4)}(c)$. (For $f'$: \textbf{subtract}.)\\
-\sub{Choice of $h$ (2 marks):} too large $\Rightarrow$ \textbf{truncation} error; too small $\Rightarrow$ \textbf{roundoff} error (cancellation, then $\div$ small $h$). Best fwd $h\approx\sqrt\varepsilon\approx10^{-8}$.
+\begin{ex}{$f(x)=\ln x$, $x_0=2$, $h=0.1$ (true $f'(2)=0.5$, $f''(2)=-0.25$)}
+fwd: $\frac{\ln2.1-\ln2}{0.1}=0.48790$\\
+bwd: $\frac{\ln2-\ln1.9}{0.1}=0.51293$\\
+central: $\frac{\ln2.1-\ln1.9}{0.2}=0.50042$ \ (best: $O(h^2)$)\\
+$f''(2)\approx\frac{\ln1.9-2\ln2+\ln2.1}{0.01}=-0.25031$
+\end{ex}
+\sub{Derive the $f''(x_0)$ formula (4 marks):}
+\begin{der}
+\item expand both sides about $x_0$:
+\begin{align*}f(x_0\pm h)&=f(x_0)\pm hf'(x_0)+\tfrac{h^2}2f''(x_0)\\&\quad\pm\tfrac{h^3}6f'''(x_0)+\tfrac{h^4}{24}f^{(4)}(c_\pm)\end{align*}
+\item \textbf{add} them (the $\pm$ terms cancel):
+\begin{align*}&f(x_0+h)+f(x_0-h)\\&=2f(x_0)+h^2f''(x_0)\\&\quad+\tfrac{h^4}{24}\big[f^{(4)}(c_+)+f^{(4)}(c_-)\big]\end{align*}
+\item rearrange and divide by $h^2$:
+\begin{align*}f''(x_0)&=\frac{f(x_0-h)-2f(x_0)+f(x_0+h)}{h^2}\\&\quad-\frac{h^2}{12}\cdot\frac{f^{(4)}(c_+)+f^{(4)}(c_-)}{2}\end{align*}
+\item IVT: the average equals $f^{(4)}(c)$ for some $c$, so the error is $-\frac{h^2}{12}f^{(4)}(c)$
+\end{der}
+(For the central $f'(x_0)$: \textbf{subtract} instead, divide by $2h$.)\\
+\sub{Choice of $h$ (2 marks):} too large $\Rightarrow$ \textbf{truncation} error; too small $\Rightarrow$ \textbf{roundoff} error (cancellation, then $\div$ small $h$). Best forward $h\approx\sqrt u\approx10^{-8}$.
 
 % ===================== WEEK 11 =====================
-\hd{W11 Integration \hfill Q13, Q14}
-\[T=\tfrac h2\big[f_0+2(f_1+\dots+f_{n-1})+f_n\big]\]
-\[S=\tfrac h3\big[f_0+4(\text{odd})+2(\text{even int.})+f_n\big]\]
-Errors: T $-\frac{(b-a)h^2}{12}f''(c)$;\ \ S $-\frac{(b-a)h^4}{180}f^{(4)}(c)$.
-\begin{tl}
-\item $n=4$: T weights $1,2,2,2,1\times\frac h2$; \ S weights $1,4,2,4,1\times\frac h3$. Simpson needs \textbf{even} $n$
-\item T exact for degree $\le1$, $O(h^2)$; S exact for degree $\le3$, $O(h^4)$ $\Rightarrow$ Simpson is more accurate
-\item \sub{Derive T:} $P_1=y_0+s\Delta y_0$, $x=x_0+sh$, $dx=h\,ds$: $\int_0^1(y_0+s\Delta y_0)h\,ds=h(y_0+\frac12\Delta y_0)=\frac h2(y_0+y_1)$. Composite: sum the strips; interior points appear twice
-\item \sub{Derive S:} $\int_0^2[y_0+s\Delta y_0+(\frac{s^2}2-\frac s2)\Delta^2y_0]h\,ds=h[2y_0+2\Delta y_0+\frac13\Delta^2y_0]$, then substitute the $\Delta$'s to get $\frac h3(y_0+4y_1+y_2)$
-\item \sub{MATLAB:} \texttt{h=(b-a)/n}; points \texttt{x(1)..x(n+1)}; \texttt{2*f} for interior; last point \texttt{x(n+1)}; Simpson \texttt{h/3}, even \texttt{n}; even MATLAB index \texttt{x(2)} is $x_1$, weight 4
-\end{tl}
+\hd{W11 Integration}
+$h=\frac{b-a}{n}$, $x_i=a+ih$, $n$ = number of strips ($n+1$ points)
+\[T=\tfrac h2\big[f(x_0)+2\big(f(x_1)+\dots+f(x_{n-1})\big)+f(x_n)\big]\]
+\[S=\tfrac h3\big[f(x_0)+4(\text{odd }i)+2(\text{even }i)+f(x_n)\big]\]
+Errors: T $-\frac{(b-a)h^2}{12}f''(c)$, $O(h^2)$, exact for degree $\le1$;\\ S $-\frac{(b-a)h^4}{180}f^{(4)}(c)$, $O(h^4)$, exact for degree $\le3$. \ Simpson needs \textbf{even} $n$.
+\begin{ex}{$\int_1^2\frac1x\,dx=\ln2=0.693147$, $n=4$, $h=0.25$}
+$f$: \ 1, \ 0.8, \ 0.66667, \ 0.571429, \ 0.5\\
+$T=\frac{0.25}{2}[1+2(0.8+0.66667+0.571429)+0.5]=0.697024$\\
+$S=\frac{0.25}{3}[1+4(0.8+0.571429)+2(0.66667)+0.5]=0.693254$\\
+Simpson is closer: $O(h^4)$ vs $O(h^2)$
+\end{ex}
+\sub{Derive the trapezoidal rule:}
+\begin{der}
+\item one strip: $P_1(x)=y_0+s\Delta y_0$, \ $x=x_0+sh$, \ $dx=h\,ds$
+\item integrate ($x_0\to x_1$ means $s=0\to1$):
+\begin{align*}\int_{x_0}^{x_1}f(x)\,dx&\approx\int_0^1(y_0+s\Delta y_0)\,h\,ds\\&=h\big(y_0+\tfrac12\Delta y_0\big)\end{align*}
+\item substitute $\Delta y_0=y_1-y_0$: \ $=\frac h2(y_0+y_1)$
+\item composite: add the $n$ strips; interior points appear twice
+\end{der}
+\sub{Derive Simpson:} same steps with $P_2$ over two strips ($s=0\to2$):
+\begin{der}
+\item $\displaystyle\int_0^2\Big[y_0+s\Delta y_0+\frac{s(s-1)}2\Delta^2y_0\Big]h\,ds$
+\item $=h\big[2y_0+2\Delta y_0+\frac13\Delta^2y_0\big]$ \ (since $\int_0^2\frac{s^2-s}{2}ds=\frac13$)
+\item substitute $\Delta y_0=y_1-y_0$, $\Delta^2y_0=y_2-2y_1+y_0$:\\ $=\frac h3(y_0+4y_1+y_2)$
+\end{der}
+\sub{MATLAB:} \texttt{h=(b-a)/n}; points \texttt{x(1)..x(n+1)}; \texttt{2*f} interior; Simpson \texttt{h/3}, even \texttt{n}; \texttt{x(2)} is $x_1$ (weight 4).
 
 % ===================== WEEK 12 =====================
-\hd{W12 Triangular systems \& LU \hfill Q15}
+\columnbreak
+\hd{W12 Triangular systems \& LU}
 \begin{tl}
-\item forward (lower): $x_i=\frac{b_i-\sum_{j<i}a_{ij}x_j}{a_{ii}}$ top$\to$down; \ backward (upper): $x_i=\frac{b_i-\sum_{j>i}a_{ij}x_j}{a_{ii}}$ bottom$\to$up
+\item forward sub.\ (lower), top$\to$down: \[x_i=\frac{b_i-\sum_{j<i}a_{ij}x_j}{a_{ii}}\]
+\item backward sub.\ (upper), bottom$\to$up: \[x_i=\frac{b_i-\sum_{j>i}a_{ij}x_j}{a_{ii}}\]
 \item \sub{Explain LU (3 marks):} $A=LU\Rightarrow L(U\mathbf x)=\mathbf b$. Let $\mathbf z=U\mathbf x$: solve $L\mathbf z=\mathbf b$ (forward), then $U\mathbf x=\mathbf z$ (backward). Reuse $L,U$ for a new $\mathbf b$
-\item \sub{Fill blanks:} $a_{ij}=$(row $i$ of $L$)$\cdot$(col $j$ of $U$); $L$ has \textbf{1s on the diagonal}; one unknown per equation (order: row of $U$, column of $L$, …)
-\item $u_{1j}=a_{1j}$;\ $\ell_{i1}=\frac{a_{i1}}{u_{11}}$;\ $u_{22}=a_{22}-\ell_{21}u_{12}$;\ $u_{23}=a_{23}-\ell_{21}u_{13}$;\ $\ell_{32}=\frac{a_{32}-\ell_{31}u_{12}}{u_{22}}$;\ $u_{33}=a_{33}-\ell_{31}u_{13}-\ell_{32}u_{23}$
-\item a zero or small pivot breaks LU $\Rightarrow$ pivoting (row swaps)
+\item \sub{Fill blanks:} $a_{ij}=$ (row $i$ of $L$)$\cdot$(col $j$ of $U$); $L$ has \textbf{1s on the diagonal}; pick the equation with one unknown
+\item a zero or tiny pivot $u_{ii}$ breaks LU $\Rightarrow$ pivoting
 \end{tl}
+\begin{ex}{$A=\begin{bmatrix}2&1&1\\4&3&3\\8&7&9\end{bmatrix}$, \ $\mathbf b=\begin{bmatrix}4\\10\\24\end{bmatrix}$}
+$L=\begin{bmatrix}1&0&0\\2&1&0\\4&3&1\end{bmatrix}$, \ $U=\begin{bmatrix}2&1&1\\0&1&1\\0&0&2\end{bmatrix}$
+
+one blank: $a_{32}=7=\ell_{31}u_{12}+\ell_{32}u_{22}=4(1)+\ell_{32}(1)\Rightarrow\ell_{32}=3$\\
+$L\mathbf z=\mathbf b$: $z_1=4$, \ $z_2=10-2(4)=2$, \ $z_3=24-4(4)-3(2)=2$\\
+$U\mathbf x=\mathbf z$: $x_3=\frac22=1$, \ $x_2=2-1=1$, \ $x_1=\frac{4-1-1}{2}=1$
+\end{ex}
 
 % ===================== WEEK 13 =====================
-\hd{W13 SPD \& Cholesky \hfill Q16}
+\hd{W13 SPD \& Cholesky}
 \begin{tl}
-\item \sub{SPD:} $A^T=A$ and $\mathbf x^TA\mathbf x>0$ for all $\mathbf x\ne\mathbf0$ (needed for Cholesky)
-\item \sub{Show PD:} [1] state the goal; [1] $\mathbf x^TA\mathbf x=ax_1^2+2bx_1x_2+cx_2^2$; [0.5] $=a(x_1+\frac bax_2)^2+(c-\frac{b^2}a)x_2^2$; [0.5] ``$=0$ only if $\mathbf x=\mathbf0$''. PD $\iff a>0,\ ac-b^2>0$
-\item \sub{Cholesky} $A=LL^T$; $a_{ij}=$(row $i$ of $L$)$\cdot$(row $j$ of $L$): $\ell_{11}=\sqrt{a_{11}}$, $\ell_{i1}=\frac{a_{i1}}{\ell_{11}}$, $\ell_{22}=\sqrt{a_{22}-\ell_{21}^2}$, $\ell_{32}=\frac{a_{32}-\ell_{31}\ell_{21}}{\ell_{22}}$, $\ell_{33}=\sqrt{a_{33}-\ell_{31}^2-\ell_{32}^2}$
-\item solve $L\mathbf z=\mathbf b$ (forward), then $L^T\mathbf x=\mathbf z$ (\textbf{backward}). Half the work of LU, no pivoting
-\item ``Is $A$ SPD?'' $\to$ ``Yes: symmetric, and the Cholesky factorisation succeeded.'' \ $\sqrt{\text{negative}}$ $\Rightarrow$ not PD
+\item \sub{SPD:} $A^T=A$ and $\mathbf x^TA\mathbf x>0$ for all $\mathbf x\ne\mathbf0$. 2$\times$2: PD $\iff a>0,\ ac-b^2>0$
+\item \sub{Cholesky:} $A=LL^T$, $a_{ij}=$ (row $i$ of $L$)$\cdot$(row $j$ of $L$). \warn{Diagonal $\ell_{jj}$: take the \textbf{positive} root.} $\sqrt{\text{negative}}\Rightarrow$ not SPD
+\item solve $L\mathbf z=\mathbf b$ (forward), then $L^T\mathbf x=\mathbf z$ (\textbf{backward})
 \end{tl}
-
-% ===================== MATLAB =====================
-\hd{MATLAB bug checklist (3 questions = 18 marks)}
-Write the correct algorithm first, then go line by line. For each bug: \textbf{line number}, \textbf{what's wrong}, \textbf{corrected line}.
-\begin{tl}
-\item variable not initialised (\texttt{t}, \texttt{w}); wrong initial value
-\item argument order \texttt{f(t,w)}; \texttt{fdash} missing chain rule \texttt{*f(t,y)}
-\item \texttt{h=(b-a)/n}; midpoint \texttt{(a+b)/2}; coefficients ($k/2$, \texttt{2*}, \texttt{/6}, $h/3$)
-\item indices \texttt{x(1)}…\texttt{x(n+1)}; loop \texttt{1:n}; Simpson needs even \texttt{n}
-\item stop logic: \texttt{while …> tol}; \texttt{if …<= tol, break}
-\item formula upside down (\texttt{f/fdash}); update swapped (\texttt{b=p}, \texttt{x=xnew})
-\item \texttt{.*} \texttt{./} \texttt{.\^{}} on vectors; relative error $\div$ \texttt{abs(true)}
-\end{tl}
+\sub{Show PD, $A=\begin{bmatrix}a&b\\b&c\end{bmatrix}$ (3 marks):}
+\begin{der}
+\item goal: $\mathbf x^TA\mathbf x>0$ for every $\mathbf x\ne\mathbf0$
+\item $\mathbf x^TA\mathbf x=ax_1^2+2bx_1x_2+cx_2^2$
+\item complete the square: $=a\big(x_1+\frac bax_2\big)^2+\big(c-\frac{b^2}a\big)x_2^2$
+\item both terms $\ge0$, and $=0$ only if $x_2=0$ and $x_1=0$, i.e.\ $\mathbf x=\mathbf0$
+\end{der}
+\begin{ex}{Cholesky of $A=\begin{bmatrix}4&2&2\\2&5&3\\2&3&6\end{bmatrix}$}
+$\ell_{11}=\sqrt4=2$, \ $\ell_{21}=\frac22=1$, \ $\ell_{31}=\frac22=1$\\
+$\ell_{22}=\sqrt{5-1^2}=2$, \ $\ell_{32}=\frac{3-(1)(1)}{2}=1$\\
+$\ell_{33}=\sqrt{6-1^2-1^2}=2$ \ (not $-2$)\\
+$L=\begin{bmatrix}2&0&0\\1&2&0\\1&1&2\end{bmatrix}$; \ ``Is $A$ SPD?'' Yes: symmetric and Cholesky succeeded
+\end{ex}
 
 \hd{Order of accuracy, all methods}
 \begin{tl}
 \item $O(h)$: Euler; forward/backward difference
-\item $O(h^2)$: Taylor 2, Mod.\ Euler; central $f'$, $f''$; trapezoid
+\item $O(h^2)$: Taylor 2, Mod.\ Euler; central $f'(x_0)$, $f''(x_0)$; trapezoid
 \item $O(h^4)$: RK4; Simpson
 \item roots: bisection and fixed point 1; secant 1.618; Newton 2
-\end{tl}
-
-\hd{Common traps, side 2}
-\begin{tl}
-\item bisection answer = the \textbf{latest midpoint}; keep the half with the sign change
-\item one secant iteration from $x_0,x_1$ gives $x_2$; write the general formula first (0.5)
-\item table end-points: forward at the left end, backward at the right end, central in the middle
-\item T uses $\frac h2$, S uses $\frac h3$; $n$ counts strips (5 points means $n=4$)
-\item LU: $\mathbf z$ is \textbf{not} the answer; solve $U\mathbf x=\mathbf z$ next
-\item Cholesky: the second solve with $L^T$ goes \textbf{bottom-up}
-\item \ex{2025 Q14: $T=2.0959$, $S=2.0934$} (check your calculator routine)
 \end{tl}
 
 \end{multicols*}
